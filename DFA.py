@@ -21,7 +21,7 @@ class DFA:
          - start: The state at which the DFA begins operation.
          - accepts: A list containing the "accepting" or "final" states of the DFA.
 
-        Making delta a function rather than a transition table makes it much easier to define certain DFAs. 
+        Making delta a function rather than a transition table makes it much easier to define certain DFAs.
         If you want to use a transition table, you can just do this:
          delta = lambda q,c: transition_table[q][c]
         One caveat is that the function should not depend on the value of 'states' or 'accepts', since
@@ -36,6 +36,7 @@ class DFA:
         self.accepts = set(accepts)
         self.alphabet = set(alphabet)
         self.current_state = start
+
 
 #
 # Administrative functions:
@@ -61,7 +62,7 @@ class DFA:
         print ""
 
     def validate(self):
-        """Checks that: 
+        """Checks that:
         (1) The accepting-state set is a subset of the state set.
         (2) The start-state is a member of the state set.
         (3) The current-state is a member of the state set.
@@ -258,14 +259,14 @@ class DFA:
         """
         #Step 1: Delete unreachable states
         self.delete_unreachable()
-        #Step 2: Partition the states into equivalence classes        
+        #Step 2: Partition the states into equivalence classes
         classes = self.mn_classes()
         #Step 3: Construct the new DFA
         self.collapse(classes)
 
     def preamble_and_kernel(self):
-        """Returns the partition of the state-set into the preamble and 
-        kernel as a 2-tuple. A state is in the preamble iff there 
+        """Returns the partition of the state-set into the preamble and
+        kernel as a 2-tuple. A state is in the preamble iff there
         are finitely many strings that reach it from the start state.
 
         See "The DFAs of Finitely Different Regular Languages" for context.
@@ -348,7 +349,7 @@ class DFA:
                     to_pluck.append(incoming)
         plucked.reverse()
         return plucked
- 
+
     def is_finite(self):
         """Indicates whether the DFA's language is a finite set."""
         D2 = self.copy()
@@ -381,7 +382,7 @@ class DFA:
 
     def hyper_minimize(self):
         """Alters the DFA into a smallest possible DFA recognizing a finitely different language.
-        In other words, if D is the original DFA and D' the result of this function, then the 
+        In other words, if D is the original DFA and D' the result of this function, then the
         symmetric difference of L(D) and L(D') will be a finite set, and there exists no smaller
         automaton than D' with this property.
 
@@ -458,7 +459,7 @@ class DFA:
         for the source of this algorithm (Campeanu, Paun, Santean, and Yu). We follow their
         algorithm exactly, except that "l" is optionally calculated for you, and the state-
         ordering is automatically created.
-        
+
         There exists a faster, O(n*logn)-time algorithm due to Korner, from CIAA 2002.
         """
 
@@ -471,7 +472,7 @@ class DFA:
         state_order = self.pluck_leaves()
         if l==None:
             l = self.longest_word_length()
-        #We're giving each state a numerical name so that the  algorithm can 
+        #We're giving each state a numerical name so that the  algorithm can
         # run on an "ordered" DFA -- see the paper for why. These functions
         # allow us to copiously convert between names.
         def nn(q): # "numerical name"
@@ -483,7 +484,7 @@ class DFA:
         # 1.1 -- Step numbering is from the paper
         level = self.levels() #holds real names
         gap = {}  #holds numerical names
-        # 1.2 
+        # 1.2
         for i in range(n):
             gap[(i, n)] = l
         if level[rn(n)] <= l:
@@ -531,7 +532,7 @@ class DFA:
 #
 
 def cross_product(D1, D2, accept_method):
-    """A generalized cross-product constructor over two DFAs. 
+    """A generalized cross-product constructor over two DFAs.
     The third argument is a binary boolean function f; a state (q1, q2) in the final
     DFA accepts if f(A[q1],A[q2]), where A indicates the acceptance-value of the state.
     """
@@ -577,9 +578,9 @@ def inverse(D):
             new_accepts.append(state)
     return DFA(states=D.states, start=D.start, delta=D.delta, accepts=new_accepts, alphabet=D.alphabet)
 
-# 
+#
 # Constructing new DFAs
-# 
+#
 
 def from_word_list(language, alphabet):
     """Constructs an unminimized DFA accepting the given finite language."""
@@ -603,7 +604,7 @@ def from_word_list(language, alphabet):
 
 def modular_zero(n, base=2):
     """Returns a DFA that accepts all binary numbers equal to 0 mod n. Use the optional
-    parameter "base" if you want something other than binary. The empty string is also 
+    parameter "base" if you want something other than binary. The empty string is also
     included in the DFA's language.
     """
     states = range(n)
@@ -614,9 +615,9 @@ def modular_zero(n, base=2):
     return DFA(states=states, alphabet=alphabet, delta=delta, start=start, accepts=accepts)
 
 def random(states_size, alphabet_size, acceptance=0.5):
-    """Constructs a random DFA with "states_size" states and "alphabet_size" inputs. Each 
-    transition destination is chosen uniformly at random, so the resultant DFA may have 
-    unreachable states. The optional "acceptance" parameter indicates what fraction of 
+    """Constructs a random DFA with "states_size" states and "alphabet_size" inputs. Each
+    transition destination is chosen uniformly at random, so the resultant DFA may have
+    unreachable states. The optional "acceptance" parameter indicates what fraction of
     the states should be accepting.
     """
     import random
@@ -632,9 +633,9 @@ def random(states_size, alphabet_size, acceptance=0.5):
     delta = lambda q, c: tt[q][c]
     return DFA(states, alphabet, delta, start, accepts)
 
-# 
+#
 # Finite-factoring
-# 
+#
 
 def finite_factor(self):
     D1 = self.copy()
