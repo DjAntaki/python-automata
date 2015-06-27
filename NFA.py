@@ -88,7 +88,7 @@ class NFA:
 # Simulating execution:
 #
     def step(self,char):
-        """Updates the DFA's current state based on a single character of input."""
+        """Updates the NFA's current state(s) based on a single character of input."""
         if char not in self.alphabet:
             return None
 
