@@ -47,20 +47,20 @@ class NFA:
         """Displays all information about the NFA in an easy-to-read way. Not
         actually that easy to read if it has too many states.
         """
-        print ""
-        print "This DFA has %s states" % len(self.states)
-        print "States:", self.states
-        print "Alphabet:", self.alphabet
-        print "Starting state:", self.start
-        print "Accepting states:", self.accepts
-        print "Transition function:"
-        print "\t","\t".join(map(str, sorted(self.states)))
+        print("")
+        print("This DFA has %s states" % len(self.states))
+        print("States:", self.states)
+        print("Alphabet:", self.alphabet)
+        print("Starting state:", self.start)
+        print("Accepting states:", self.accepts)
+        print("Transition function:")
+        print("\t","\t".join(map(str, sorted(self.states))))
         for c in self.alphabet:
             results = map(lambda x: self.delta(x, c), sorted(self.states))
-            print c, "\t", "\t".join(map(str, results))
-        print "Current state:", self.current_state
-        print "Currently accepting:", self.status()
-        print ""
+            print(c, "\t", "\t".join(map(str, results)))
+        print("Current state:", self.current_state)
+        print("Currently accepting:", self.status())
+        print("")
 
     def validate(self):
         """Checks that:
