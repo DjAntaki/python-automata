@@ -2,7 +2,7 @@ from NFA import NFA
 from string import ascii_lowercase
 from itertools import product
 
-saved_objects = []
+saved = []
 
 def nfa_input():
 
@@ -93,28 +93,30 @@ def nfa_input():
 #   def __init__(self, states, alphabet, delta, start, accepts, epsilon='epi'):
     n = NFA(states,alphabet,lambda x,y:transition_table[x][y],0,finals, epsilon="epsilon")
     print("You have sucessfully created a NFA.")
+
     return n
 
 while(True):
 
-    print("Welcome to the prompt!")
+    print("This program needs to be run with the -i command.")
+    print("Welcome to the make-your-own-automata prompt interface!")
     print("Choose between : ")
-    print("1.input DFA")
-    print("2.input NFA")
-    print("x. quit")
+    print("1.create DFA")
+    print("2.create NFA")
+    print("x. Go to python prompt and access created automata")
 
     tmp = raw_input()
     if(tmp == '1'):
-        print("Welcome to the DFA prompt")
         print("Not implemented yet.")
     elif(tmp == '2'):
-        saved_objects.append(nfa_input())
-
+        saved.append(nfa_input())
+        print("The NFA has been saved as iterable \"saved\" "+str(len(saved)-1)+"th elementh. ")
 
     elif(tmp == 'x'):
-        print("Good bye.")
         break
     else :
         print("Unrecognized answer.")
         print(tmp)
+
+print("There is "+str(len(saved))+" elements in iterable \"saved\" ")
 
