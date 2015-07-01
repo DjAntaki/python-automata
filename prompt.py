@@ -8,6 +8,9 @@ def nfa_input():
 
     print("Welcome to the NFA prompt")
     while(True):
+        print("Enter a label for your NFA :")
+        label = raw_input()
+    
         print("Enter size of alphabet :")
         tmp = raw_input("|E| = ")
         try:
@@ -92,6 +95,7 @@ def nfa_input():
 
 #   def __init__(self, states, alphabet, delta, start, accepts, epsilon='epi'):
     n = NFA(states,alphabet,lambda x,y:transition_table[x][y],0,finals, epsilon="epsilon")
+    n.label = label
     print("You have sucessfully created a NFA.")
 
     return n

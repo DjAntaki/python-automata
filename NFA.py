@@ -48,7 +48,7 @@ class NFA:
         actually that easy to read if it has too many states.
         """
         print("")
-        print("This DFA has %s states" % len(self.states))
+        print("This NFA has %s states" % len(self.states))
         print("States:", self.states)
         print("Alphabet:", self.alphabet)
         print("Starting state:", self.start)
@@ -59,6 +59,38 @@ class NFA:
             results = map(lambda x: self.delta(x, c), sorted(self.states))
             print(c, "\t", "\t".join(map(str, results)))
         print("Current state:", self.current_state)
+        print("Currently accepting:", self.status())
+        print("")
+
+    def pretty_print2(self):
+        """Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.
+        """
+        def str2(x):
+            if hasattr(x,'__iter__'):
+                return '('+''.join([str(y)+", " for y in x])[:-2]+')'
+            else : return str(x)
+
+        print("")
+        print("This NFA has %s states" % len(self.states))
+        print("States:", map(str2,self.states))
+        print("Alphabet:", self.alphabet)
+        print("Starting state:", str2(self.start))
+        print("Accepting states:", map(str2,self.accepts))
+        print("Transition table:")
+#        print("\t","\t".join(map(str2, sorted(self.states))))
+        import utils
+        tmp = "{"
+        transition_table = utils.get_transition_table(self.delta,self.states,self.alphabet)
+        for x in sorted(self.states):
+            tmp += str2(x)+":{"+", ".join([str(c)+":"+'{'+', '.join([str2(transition_table[x][c])])+'}' for c in self.alphabet])+"},\n"
+        tmp = tmp[:-2]+"}"
+
+#        for key,value in transition_table.iteritems():
+
+ #           tmp += str2(key)+":"+str2(value)+", "
+        print(tmp)
+#        print(c, ",".join(map(str2, results)))
+        print("Current state:", str2(self.current_state))
         print("Currently accepting:", self.status())
         print("")
 
@@ -142,13 +174,15 @@ class NFA:
     def build_DFA_from_NFA(self):
         saved_state = self.current_state
         self.reset()
+        alpha = self.alphabet.copy()
+        alpha.remove(self.EPSILON)
         delta = {}
         dfa_states = []
         to_explore_queue = [frozenset(self.current_state)]
         while(len(to_explore_queue) != 0):
             e = to_explore_queue.pop(0)
             delta[e] = dict()
-            for a in self.alphabet :
+            for a in alpha :
                 self.current_state = e
                 self.step(a)
                 entry = frozenset(self.current_state)
@@ -160,7 +194,7 @@ class NFA:
 
         #   Calculate accept
         accept = filter(lambda x: len(self.accepts & x ) > 0,dfa_states)
-
-        return DFA(dfa_states, self.alphabet, lambda x,y : delta[x][y], dfa_states[0], accept)
+        self.current_state = saved_state
+        return DFA(dfa_states, alpha, lambda x,y : delta[x][y], dfa_states[0], accept)
 
 

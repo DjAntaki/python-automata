@@ -24,6 +24,7 @@ def test1():
 
     test_nfa = NFA(etats,alphabet,lambda x,y: d[x][y],start,accept)
 
+    #Some words to test.
     assert test_nfa.recognizes('') is True
     assert test_nfa.recognizes('a') is True
     assert test_nfa.recognizes('aaaaaaaaaaaaaa') is True
@@ -43,7 +44,9 @@ def test1():
     assert test_nfa.recognizes('abbac') is False
     assert test_nfa.recognizes('abbab') is False
 
-def tests2():
+    return test_nfa
+
+def test2():
     #Example tiré des notes de cours de Pierre Mckenzie pour le cours IFT2105
 
     #NFA that accepts words with |w|_a = 0 mod 2 or |w|_b = 0 mod 4
@@ -113,7 +116,8 @@ def tests2():
 
     #Time to test!
     to_test = [nfa,dfa,dfa2]
-
+    verbose = False
+    print("121")
     results = [x.recognizes('') for x in to_test]
     assert all(results) is True
 
@@ -129,5 +133,23 @@ def tests2():
                 assert all([r is True for r in results])
             else :
                 assert all([r is False for r in results])
+                
+    return to_test
 test1()
-tests2()
+a = test2()
+
+"""
+epsilon = 'epi'
+alphabet = ['a']
+states = range(5)
+
+def delt(state, symbol):
+    if symbol == 'epi':
+        if state == 0:
+            return 4
+    if state == 0:
+        if symbol =='a':
+            return 
+
+x = NFA()
+"""

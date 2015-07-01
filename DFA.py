@@ -60,6 +60,38 @@ class DFA:
         print("Current state:", self.current_state)
         print("Currently accepting:", self.status())
         print("")
+        
+    def pretty_print2(self):
+        """Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.
+        """
+        def str2(x):
+            if hasattr(x,'__iter__'):
+                return '('+''.join([str(y)+", " for y in x])[:-2]+')'
+            else : return str(x)
+
+        print("")
+        print("This DFA has %s states" % len(self.states))
+        print("States:", map(str2,self.states))
+        print("Alphabet:", self.alphabet)
+        print("Starting state:", str2(self.start))
+        print("Accepting states:", map(str2,self.accepts))
+        print("Transition table:")
+#        print("\t","\t".join(map(str2, sorted(self.states))))
+        import utils
+        tmp = "{"
+        transition_table = utils.get_transition_table(self.delta,self.states,self.alphabet)
+        for x in sorted(self.states):
+            tmp += str2(x)+":{"+", ".join([str(c)+":"+str2(transition_table[x][c]) for c in self.alphabet])+"},\n"
+        tmp = tmp[:-2]+"}"
+
+#        for key,value in transition_table.iteritems():
+
+ #           tmp += str2(key)+":"+str2(value)+", "
+        print(tmp)
+#        print(c, ",".join(map(str2, results)))
+        print("Current state:", str2(self.current_state))
+        print("Currently accepting:", self.status())
+        print("")
 
     def validate(self):
         """Checks that:
