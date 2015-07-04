@@ -59,10 +59,10 @@ def test2():
     accept = set(['a_0','b_0'])
 
     def delt(state,symbol):
-
+        print(state, symbol)
         if(state[0] == 'a' ):
             if (symbol == 'a'):
-                return 'a_'+str((int(state[2])+1) %2)
+                return 'a_'+str((int(state[2])+1) % 2)
             elif (symbol == 'b'):
                 return state
             else :
@@ -71,7 +71,7 @@ def test2():
             if (symbol == 'a'):
                 return state
             elif (symbol == 'b'):
-                return 'b_'+str((int(state[2])+1) %4)
+                return 'b_'+str((int(state[2])+1) % 4)
             else :
                 return None
         elif(state == 'e'):
@@ -83,7 +83,7 @@ def test2():
     nfa = NFA(etats,alphabet,delt,start,accept)
 
     dfa = nfa.build_DFA_from_NFA()
-
+    print("qweqwe")
     #Ok next is an equivalent DFA resulting of the union of
     # the DFA that accepts only (|w|_a = 0 mod 2) and
     # the DFA that accepts only (|w|_b = 0 mod 4)
@@ -120,12 +120,13 @@ def test2():
     print("121")
     results = [x.recognizes('') for x in to_test]
     assert all(results) is True
-
+    verbose = True
     for x in range(1,10):
         for i in product(alphabet, repeat=x):
             entree = ''.join(i)
             if verbose : print(entree)
-            results = [x.recognizes(entree) for x in to_test]
+           # if entree=='abbbb':  import ipdb;ipdb.set_trace()
+            results = [y.recognizes(entree) for y in to_test]
             if verbose : print(results)
             if entree.count('a') % 2 == 0 :
                 assert all([r is True for r in results])

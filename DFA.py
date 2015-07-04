@@ -7,6 +7,7 @@
 
 from copy import copy
 from UnionFind import UnionFind
+import collections
 
 # TODO: general code cleanup
 # TODO: write tests
@@ -55,7 +56,7 @@ class DFA:
         print("Transition function:")
         print("\t","\t".join(map(str, sorted(self.states))))
         for c in self.alphabet:
-            results = map(lambda x: self.delta(x, c), sorted(self.states))
+            results = [self.delta(x, c) for x in sorted(self.states)]
             print(c, "\t", "\t".join(map(str, results)))
         print("Current state:", self.current_state)
         print("Currently accepting:", self.status())
@@ -71,10 +72,10 @@ class DFA:
 
         print("")
         print("This DFA has %s states" % len(self.states))
-        print("States:", map(str2,self.states))
+        print("States:", list(map(str2,self.states)))
         print("Alphabet:", self.alphabet)
         print("Starting state:", str2(self.start))
-        print("Accepting states:", map(str2,self.accepts))
+        print("Accepting states:", list(map(str2,self.accepts)))
         print("Transition table:")
 #        print("\t","\t".join(map(str2, sorted(self.states))))
         import utils
@@ -89,8 +90,8 @@ class DFA:
  #           tmp += str2(key)+":"+str2(value)+", "
         print(tmp)
 #        print(c, ",".join(map(str2, results)))
-        print("Current state:", str2(self.current_state))
-        print("Currently accepting:", self.status())
+        print(("Current state:", str2(self.current_state)))
+        print(("Currently accepting:", self.status()))
         print("")
 
     def validate(self):
@@ -150,7 +151,7 @@ class DFA:
         """
         d = {}
         for state in self.states:
-            if callable(value):
+            if isinstance(value, collections.Callable):
                 d[state] = value()
             else:
                 d[state] = value
@@ -192,7 +193,7 @@ class DFA:
                 if reached[next] == False:
                     reached[next] = True
                     to_process.append(next)
-        return filter(lambda q: reached[q], self.states)
+        return [q for q in self.states if reached[q]]
 
     def reachable(self):
         """Returns the reachable subset of the DFA's states."""
@@ -214,7 +215,7 @@ class DFA:
         classes = []
         if self.accepts != []:
             classes.append(self.accepts)
-        nonaccepts = filter(lambda x: x not in self.accepts, self.states)
+        nonaccepts = [x for x in self.states if x not in self.accepts]
         if nonaccepts != []:
             classes.append(nonaccepts)
         while changed:
@@ -312,8 +313,8 @@ class DFA:
             if q in reachable[q]:
                 for next in reachable[q]:
                     in_fin[next] = False
-        preamble = filter(lambda x: in_fin[x], self.states)
-        kernel = filter(lambda x: not in_fin[x], self.states)
+        preamble = [x for x in self.states if in_fin[x]]
+        kernel = [x for x in self.states if not in_fin[x]]
         return (preamble, kernel)
 
     def pluck_leaves(self):
@@ -429,8 +430,8 @@ class DFA:
         # Step 4: Merge (f_merge_states in the paper)
         # (Could be done more efficiently)
         for sc in state_classes:
-            pres = filter(lambda s: s in preamble, sc)
-            kers = filter(lambda s: s in kernel, sc)
+            pres = [s for s in sc if s in preamble]
+            kers = [s for s in sc if s in kernel]
             if len(kers):
                 rep = kers[0]
                 for p_state in pres:
@@ -639,8 +640,8 @@ def modular_zero(n, base=2):
     parameter "base" if you want something other than binary. The empty string is also
     included in the DFA's language.
     """
-    states = range(n)
-    alphabet = map(str, range(base))
+    states = list(range(n))
+    alphabet = list(map(str, list(range(base))))
     delta = lambda q, c: ((q*base+int(c)) % n)
     start = 0
     accepts = [0]
@@ -653,9 +654,9 @@ def random(states_size, alphabet_size, acceptance=0.5):
     the states should be accepting.
     """
     import random
-    states = range(states_size)
+    states = list(range(states_size))
     start = 0
-    alphabet = range(alphabet_size)
+    alphabet = list(range(alphabet_size))
     accepts = random.sample(states, int(acceptance*states_size))
     tt = {}
     for q in states:

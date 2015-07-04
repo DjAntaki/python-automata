@@ -66,7 +66,9 @@ class NFA:
         """Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.
         """
         def str2(x):
-            if hasattr(x,'__iter__'):
+#            if hasattr(x,'__iter__'):
+            t = type(x)
+            if t == set or t == frozenset or t == list:
                 return '('+''.join([str(y)+", " for y in x])[:-2]+')'
             else : return str(x)
 
@@ -135,8 +137,10 @@ class NFA:
         else :
 #            self.current_state = self.delta(self.current_state, char)
             a = set()
+            qwe = [self.delta(i,char) for i in self.current_state]
+            print(self.current_state, qwe)
             for x in [self.delta(i,char) for i in self.current_state]:
-                if hasattr(x,'__iter__'):
+                if type(x) == set or type(x) == list:
                     a.update(x)
                 elif x is not None :
                     a.add(x)
