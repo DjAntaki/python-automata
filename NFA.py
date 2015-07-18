@@ -35,7 +35,7 @@ class NFA(FiniteStateMachine):
         self.delta = delta
         self.accepts = set(accepts)
         self.alphabet = set(alphabet)
-        self.current_state = self.start
+        self.current_state = self.start.copy()
         self.EPSILON=epsilon
         self.alphabet.add(self.EPSILON)
         self._perform_eps_closure()
@@ -51,8 +51,8 @@ class NFA(FiniteStateMachine):
         (4) Every transition returns a set of members of the state set.
         """
         assert set(self.accepts).issubset(set(self.states))
-        assert self.start in self.states
-        assert self.current_state in self.states
+        assert self.start <= self.states
+        assert self.current_state <= self.states
         for state in self.states:
             for char in self.alphabet:
                 a = self.delta(state,char)
@@ -110,7 +110,7 @@ class NFA(FiniteStateMachine):
 
     def reset(self):
         """Returns the NFA to the starting state."""
-        self.current_state = self.start
+        self.current_state = self.start.copy()
         self._perform_eps_closure()
 
     def recognizes(self, char_sequence):
