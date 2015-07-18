@@ -56,9 +56,9 @@ class NFA(FiniteStateMachine):
         for state in self.states:
             for char in self.alphabet:
                 a = self.delta(state,char)
-                if hasattr(a,'__iter__'):
+                if type(a) == list or type(a) == set:
                     assert a <= self.states
-                else:
+                elif not a is None:
                     assert a in self.states
 
     def copy(self):
