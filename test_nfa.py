@@ -59,7 +59,7 @@ def test2():
     accept = set(['a_0','b_0'])
 
     def delt(state,symbol):
-        print(state, symbol)
+
         if(state[0] == 'a' ):
             if (symbol == 'a'):
                 return 'a_'+str((int(state[2])+1) % 2)
@@ -81,9 +81,8 @@ def test2():
                 return None
 
     nfa = NFA(etats,alphabet,delt,start,accept)
-
     dfa = nfa.build_DFA_from_NFA()
-    print("qweqwe")
+
     #Ok next is an equivalent DFA resulting of the union of
     # the DFA that accepts only (|w|_a = 0 mod 2) and
     # the DFA that accepts only (|w|_b = 0 mod 4)
@@ -114,10 +113,11 @@ def test2():
     dfa2b = DFA.DFA(etats2b, alphabet, delt2b, 'b_0', ['b_0'])
     dfa2 = DFA.union(dfa2a,dfa2b)
 
+
     #Time to test!
     to_test = [nfa,dfa,dfa2]
     verbose = False
-    print("121")
+
     results = [x.recognizes('') for x in to_test]
     assert all(results) is True
     verbose = True
@@ -138,19 +138,3 @@ def test2():
     return to_test
 test1()
 a = test2()
-
-"""
-epsilon = 'epi'
-alphabet = ['a']
-states = range(5)
-
-def delt(state, symbol):
-    if symbol == 'epi':
-        if state == 0:
-            return 4
-    if state == 0:
-        if symbol =='a':
-            return 
-
-x = NFA()
-"""

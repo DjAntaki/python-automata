@@ -32,8 +32,8 @@ class NFA:
         self.alphabet = set(alphabet)
         self.current_state = self.start
         self.EPSILON=epsilon
-        self.alphabet.add(self.EPSILON)
-
+        self.alph_with_epsilon = self.alphabet.copy()
+        self.alph_with_epsilon.add(self.EPSILON)
         self._perform_eps_closure()
 
         if len(self.start) is not 1:
@@ -82,9 +82,9 @@ class NFA:
 #        print("\t","\t".join(map(str2, sorted(self.states))))
         import utils
         tmp = "{"
-        transition_table = utils.get_transition_table(self.delta,self.states,self.alphabet)
+        transition_table = utils.get_transition_table(self.delta,self.states,self.alph_with_epsilon)
         for x in sorted(self.states):
-            tmp += str2(x)+":{"+", ".join([str(c)+":"+'{'+', '.join([str2(transition_table[x][c])])+'}' for c in self.alphabet])+"},\n"
+            tmp += str2(x)+":{"+", ".join([str(c)+":"+'{'+', '.join([str2(transition_table[x][c])])+'}' for c in self.alph_with_epsilon])+"},\n"
         tmp = tmp[:-2]+"}"
 
 #        for key,value in transition_table.iteritems():
@@ -116,15 +116,15 @@ class NFA:
 
     def copy(self):
         """Returns a copy of the DFA. No data is shared with the original."""
-        return NFA(self.states, self.alphabet, self.delta, self.start, self.accepts)
+        return NFA(self.states, self.alphabet, self.delta, self.start, self.accepts, self.EPSILON)
 
 #
 # Simulating execution:
 #
     def step(self,char):
         """Updates the NFA's current state(s) based on a single character of input."""
-        if char not in self.alphabet:
-            return None
+        if char not in self.alph_with_epsilon:
+            raise Exception
 
         self.current_state = self.input(char)
 
@@ -132,14 +132,14 @@ class NFA:
 
     def input(self, char):
         """Calculate the states resulting on a single character of input based on current state."""
-        if char not in self.alphabet:
-            return None
+        if char not in self.alph_with_epsilon:
+            raise Exception
         else :
 #            self.current_state = self.delta(self.current_state, char)
             a = set()
-            qwe = [self.delta(i,char) for i in self.current_state]
-            print(self.current_state, qwe)
-            for x in [self.delta(i,char) for i in self.current_state]:
+            q = [self.delta(i,char) for i in self.current_state]
+
+            for x in q:
                 if type(x) == set or type(x) == list:
                     a.update(x)
                 elif x is not None :
@@ -178,27 +178,23 @@ class NFA:
     def build_DFA_from_NFA(self):
         saved_state = self.current_state
         self.reset()
-        alpha = self.alphabet.copy()
-        alpha.remove(self.EPSILON)
         delta = {}
         dfa_states = []
         to_explore_queue = [frozenset(self.current_state)]
         while(len(to_explore_queue) != 0):
             e = to_explore_queue.pop(0)
             delta[e] = dict()
-            for a in alpha :
+            for a in self.alphabet :
                 self.current_state = e
                 self.step(a)
                 entry = frozenset(self.current_state)
                 delta[e][a] = entry
                 if (entry not in to_explore_queue and entry not in dfa_states) :
-#                if not( any(self.current_state == i for i in to_explore_queue) or any(self.current_state == i for i in dfa_states)):
                     to_explore_queue.append(entry)
             dfa_states.append(e)
 
         #   Calculate accept
         accept = filter(lambda x: len(self.accepts & x ) > 0,dfa_states)
         self.current_state = saved_state
-        return DFA(dfa_states, alpha, lambda x,y : delta[x][y], dfa_states[0], accept)
-
+        return DFA(dfa_states, self.alphabet.copy(), lambda x,y : delta[x][y], dfa_states[0], accept)
 

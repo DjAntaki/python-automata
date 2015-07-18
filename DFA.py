@@ -12,6 +12,7 @@ import collections
 # TODO: general code cleanup
 # TODO: write tests
 
+
 class DFA:
     """This class represents a deterministic finite automaton."""
     def __init__(self, states, alphabet, delta, start, accepts):
@@ -560,6 +561,8 @@ class DFA:
                         P[j] = True
         return l
 
+
+
 #
 # Boolean set operations on languages -- end of the DFA class
 #
@@ -610,6 +613,13 @@ def inverse(D):
         if state not in D.accepts:
             new_accepts.append(state)
     return DFA(states=D.states, start=D.start, delta=D.delta, accepts=new_accepts, alphabet=D.alphabet)
+
+def equals(D1, D2):
+    """T"""
+    d = symmetric_difference(D1,D2)
+    if(d.is_finite() and d.longest_word_length() is None):
+        return True
+    return False
 
 #
 # Constructing new DFAs
