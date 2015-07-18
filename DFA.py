@@ -8,12 +8,12 @@
 from copy import copy
 from UnionFind import UnionFind
 import collections
-
+from FiniteStateMachine import FiniteStateMachine
 # TODO: general code cleanup
 # TODO: write tests
 
 
-class DFA:
+class DFA(FiniteStateMachine):
     """This class represents a deterministic finite automaton."""
     def __init__(self, states, alphabet, delta, start, accepts):
         """The inputs to the class are as follows:

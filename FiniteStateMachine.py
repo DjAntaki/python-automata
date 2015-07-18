@@ -3,20 +3,16 @@
 
 import pickle
 from itertools import product
-from NFA import NFA
-from DFA import DFA
 # Some small utils
 
 class FiniteStateMachine:
-
-
-
 
     def getAlphabet(self):
         """
         Returns a set containing the alphabet.
         If the FSM is non-deterministic, this function does not return the epsilon symbol.
         """
+        from NFA import NFA
         if type(self) == NFA:
             return self.alphabet - {self.EPSILON}
         return self.alphabet
@@ -37,11 +33,10 @@ class FiniteStateMachine:
         return d
 
     def accepted_words_under_max_length(self, max_length):
-        """Try all words of length <=Prints the accepted words that"""
+        """Try all words of length < than input and return the list of those accepted."""
         accepted_words_list = []
-
         for x in range(1, max_length):
-            for i in product(self.getAlphabet(), repeat=x): #IF NFA remove epsilon.
+            for i in product(self.getAlphabet(), repeat=x):
                 entree = ''.join(i)
                 if self.recognizes(entree):
                     accepted_words_list.append(entree)
@@ -50,9 +45,7 @@ class FiniteStateMachine:
 
 
     def accepted_words_under_word(self, max_word):
-        """Try all words of before in the alphabetical enumeration and return the accepted words"""
-
-
+        """Try all words of before"""
         accepted_words_list = []
         for x in range(1, len(max_word) + 1):
             for i in product(self.getAlphabet(), repeat=x):
@@ -97,7 +90,8 @@ class FiniteStateMachine:
         actually that easy to read if it has too many states.
         """
         print("")
-        print("This NFA has %s states" % len(self.states))
+        print("This FSM has %s states" % len(self.states))
+        print("Type : "+str(type(self)))
         print("States:", self.states)
         print("Alphabet:", self.alphabet)
         print("Starting state:", self.start)
@@ -121,7 +115,8 @@ class FiniteStateMachine:
             else : return str(x)
 
         print("")
-        print("This NFA has %s states" % len(self.states))
+        print("This FSM has %s states" % len(self.states))
+        print("Type : "+str(type(self)))
         print("States:", map(str2,self.states))
         print("Alphabet:", self.alphabet)
         print("Starting state:", str2(self.start))
@@ -140,12 +135,6 @@ class FiniteStateMachine:
         print("Current state:", str2(self.current_state))
         print("Currently accepting:", self.status())
         print("")
-
-#
-# Simulating execution:
-#
-
-
 
 def save_machine(FA, path):
     "Saves a single automaton"
