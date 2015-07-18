@@ -2,7 +2,7 @@ from DFA import DFA
 from NFA import NFA
 from string import ascii_lowercase
 from itertools import product
-import utils
+import FiniteStateMachine
 
 saved = {}
 
@@ -13,7 +13,7 @@ def save_prompt(FA):
     if x == '':
         return
     else :
-        utils.save_machine(FA,x)
+        FiniteStateMachine.save_machine(FA,x)
 
 def dfa_input():
 

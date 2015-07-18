@@ -39,62 +39,6 @@ class DFA:
         self.alphabet = set(alphabet)
         self.current_state = start
 
-
-#
-# Administrative functions:
-#
-
-    def pretty_print(self):
-        """Displays all information about the DFA in an easy-to-read way. Not
-        actually that easy to read if it has too many states.
-        """
-        print("")
-        print("This DFA has %s states" % len(self.states))
-        print("States:", self.states)
-        print("Alphabet:", self.alphabet)
-        print("Starting state:", self.start)
-        print("Accepting states:", self.accepts)
-        print("Transition function:")
-        print("\t","\t".join(map(str, sorted(self.states))))
-        for c in self.alphabet:
-            results = [self.delta(x, c) for x in sorted(self.states)]
-            print(c, "\t", "\t".join(map(str, results)))
-        print("Current state:", self.current_state)
-        print("Currently accepting:", self.status())
-        print("")
-        
-    def pretty_print2(self):
-        """Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.
-        """
-        def str2(x):
-            if hasattr(x,'__iter__'):
-                return '('+''.join([str(y)+", " for y in x])[:-2]+')'
-            else : return str(x)
-
-        print("")
-        print("This DFA has %s states" % len(self.states))
-        print("States:", list(map(str2,self.states)))
-        print("Alphabet:", self.alphabet)
-        print("Starting state:", str2(self.start))
-        print("Accepting states:", list(map(str2,self.accepts)))
-        print("Transition table:")
-#        print("\t","\t".join(map(str2, sorted(self.states))))
-        import utils
-        tmp = "{"
-        transition_table = utils.get_transition_table(self.delta,self.states,self.alphabet)
-        for x in sorted(self.states):
-            tmp += str2(x)+":{"+", ".join([str(c)+":"+str2(transition_table[x][c]) for c in self.alphabet])+"},\n"
-        tmp = tmp[:-2]+"}"
-
-#        for key,value in transition_table.iteritems():
-
- #           tmp += str2(key)+":"+str2(value)+", "
-        print(tmp)
-#        print(c, ",".join(map(str2, results)))
-        print(("Current state:", str2(self.current_state)))
-        print(("Currently accepting:", self.status()))
-        print("")
-
     def validate(self):
         """Checks that:
         (1) The accepting-state set is a subset of the state set.
@@ -116,15 +60,17 @@ class DFA:
 #
 # Simulating execution:
 #
-
     def input(self, char):
+        return self.delta(self.current_state, char)
+
+    def step(self, char):
         """Updates the DFA's current state based on a single character of input."""
         self.current_state = self.delta(self.current_state, char)
 
-    def input_sequence(self, char_sequence):
+    def step_sequence(self, char_sequence):
         """Updates the DFA's current state based on an iterable of inputs."""
         for char in char_sequence:
-            self.input(char)
+            self.step(char)
 
     def status(self):
         """Indicates whether the DFA's current state is accepting."""
@@ -138,7 +84,7 @@ class DFA:
         """Indicates whether the DFA accepts a given string."""
         state_save = self.current_state
         self.reset()
-        self.input_sequence(char_sequence)
+        self.step_sequence(char_sequence)
         valid = self.status()
         self.current_state = state_save
         return valid

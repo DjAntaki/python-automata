@@ -17,14 +17,14 @@ print "Given a binary input, d accepts if the number represented is divisible by
 d.pretty_print()
 #raw_input()
 print 'd.input_sequence("1110101011101") #7517'
-d.input_sequence("1110101011101") #7517
+d.step_sequence("1110101011101") #7517
 print "Current state:", d.current_state
 print "Accepting:", d.status()
 #raw_input()
 print "Resetting..."
 d.reset()
 print d.current_state
-d.input_sequence("10011011101") #1245
+d.step_sequence("10011011101") #1245
 print d.current_state
 print d.status()
 
