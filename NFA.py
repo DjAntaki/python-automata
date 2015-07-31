@@ -97,8 +97,14 @@ class NFA(FiniteStateMachine):
 
     def _perform_eps_closure(self):
         """Update the NFA's current state based on all epsilon transition you can take from any member of current_state"""
-        self.current_state.update(self.input(self.EPSILON))
-
+        s = len(self.current_state)
+        while True:
+            self.current_state.update(self.input(self.EPSILON))
+            x = len(self.current_state)
+            if x == s :
+                break
+            else :
+                s = x
     def input_sequence(self, char_sequence):
         """Updates the DFA's current state based on an iterable of inputs."""
         for char in char_sequence:
