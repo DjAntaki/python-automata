@@ -1,7 +1,11 @@
 Prompt Interface
 =============
 
-The file prompt.py is if python >=3. The file prompt2.py is for python 2.7
+To use the interactive prompt interface, use one of the two following command :
+- python -i prompt2.py
+- python3 -i prompt.py
+
+You will be then asked ...
 
 .. automodule:: prompt
    :members:

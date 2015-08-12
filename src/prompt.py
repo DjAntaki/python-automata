@@ -1,15 +1,18 @@
 from string import ascii_lowercase
 from itertools import product
 
-import DFA
-import FiniteStateMachine
+from DFA import DFA
 from NFA import NFA
-from src import FiniteStateMachine
+import FiniteStateMachine
 
 saved = {}
 
 def save_prompt(FA):
-    x = input("If you want to save this state machine, please enter a path. \n"+
+    """
+    Interactive prompt for saving a finite automaton.
+    :param FA: A finite automaton
+    """
+    x = input("If you want to save this finite state machine, please enter a path. \n"+
               "If you do not want to save, press enter.")
 
     if x == '':
@@ -18,7 +21,10 @@ def save_prompt(FA):
         FiniteStateMachine.save_machine(FA,x)
 
 def dfa_input():
-
+    """
+    Interactive prompt for initializing a DFA
+    :return: a DFA
+    """
     print("Welcome to the DFA prompt")
     while(True):
         print("Enter a label for your DFA :")
@@ -113,6 +119,10 @@ def dfa_input():
     return n
 
 def nfa_input():
+    """
+    Interactive prompt for initializing a NFA.
+    :return: a NFA
+    """
 
     print("Welcome to the NFA prompt")
     while(True):
@@ -210,7 +220,6 @@ def nfa_input():
     return n
 
 if __name__ == '__main__':
-
     print("This script needs to be run with the -i command.")
 
     while(True):

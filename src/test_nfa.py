@@ -4,8 +4,6 @@
 from itertools import product
 
 import NFA
-
-#from src import NFA
 import DFA
 import regexToNFA
 
@@ -129,7 +127,6 @@ def test2():
     to_test = [nfa,dfa,dfa2, nfa_from_reg, dfa_from_reg]
     verbose = False
 
-    nfa.pretty_print2()
     results = [x.recognizes('') for x in to_test]
     assert all(results) is True
     verbose = True

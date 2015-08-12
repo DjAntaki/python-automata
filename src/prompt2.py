@@ -1,18 +1,16 @@
 from string import ascii_lowercase
 from itertools import product
 
-import DFA
+from DFA import DFA
 import FiniteStateMachine
 from NFA import NFA
-from src import FiniteStateMachine
 
 saved = {}
 
 def save_prompt(FA):
     """
-    Interactive prompt for saving a Finite automaton.
-    :param FA:
-    :return:
+    Interactive prompt for saving a finite automaton.
+    :param FA: A finite automaton
     """
     x = raw_input("If you want to save this finite state machine, please enter a path. \n"+
               "If you do not want to save, press enter.")
