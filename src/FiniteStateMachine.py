@@ -13,10 +13,10 @@ class FiniteStateMachine:
         If the FSM is non-deterministic, this function does not return the epsilon symbol.
         if you actually want the alphabet with the epsilon, use self.alphabet
         """
-        import NFA
-
-        if type(self) == NFA:
+        from NFA import NFA
+        if isinstance(self,NFA):
             return self.alphabet - {self.EPSILON}
+
         return self.alphabet
 
     def get_transition_table(self):
@@ -28,10 +28,7 @@ class FiniteStateMachine:
         \>>> t = x.get_transition_table()
         \>>> t[0]['a']
             1
-
         """
-
-
         d = {}
         for x in sorted(self.states):
             d[x] = {}
@@ -41,7 +38,10 @@ class FiniteStateMachine:
         return d
 
     def accepted_under_length(self, max_length):
-        """Try all words of length < than input and return the list of those accepted."""
+        """
+        Try all words of length < than input and return the list of those accepted.
+
+        """
         accepted_words_list = []
         for x in range(1, max_length):
             for i in product(self.getAlphabet(), repeat=x):
