@@ -1,0 +1,27 @@
+.. python-automata documentation master file, created by
+   sphinx-quickstart on Tue Aug 11 13:41:27 2015.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to python-automata's documentation!
+===========================================
+
+Contents:
+
+.. toctree::
+   :maxdepth: 2
+
+   FiniteStateMachine
+   DFA
+   NFA
+   regexToNFA
+   prompt
+   credits
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+

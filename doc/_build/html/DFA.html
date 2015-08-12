@@ -1,0 +1,373 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>DFA &mdash; python_automata 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="python_automata 2.0 documentation" href="index.html" />
+    <link rel="next" title="Credits" href="credits.html" />
+    <link rel="prev" title="Welcome to python-automata’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="credits.html" title="Credits"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to python-automata’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">python_automata 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="dfa">
+<h1>DFA<a class="headerlink" href="#dfa" title="Permalink to this headline">¶</a></h1>
+<p>Paragraphe au debut</p>
+<span class="target" id="module-DFA"></span><dl class="class">
+<dt id="DFA.DFA">
+<em class="property">class </em><tt class="descclassname">DFA.</tt><tt class="descname">DFA</tt><big>(</big><em>states</em>, <em>alphabet</em>, <em>delta</em>, <em>start</em>, <em>accepts</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class represents a deterministic finite automaton.</p>
+<dl class="method">
+<dt id="DFA.DFA.DFCA_minimize">
+<tt class="descname">DFCA_minimize</tt><big>(</big><em>l=None</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.DFCA_minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.DFCA_minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>DFCA minimization&#8221;
+Input: &#8220;self&#8221; is a DFA accepting a finite language
+Result: &#8220;self&#8221; is DFCA-minimized, and the returned value is the length of the longest</p>
+<blockquote>
+<div>word accepted by the original DFA</div></blockquote>
+<p>See &#8220;Minimal cover-automata for finite languages&#8221; for context on DFCAs, and
+&#8220;An O(n^2) Algorithm for Constructing Minimal Cover Automata for Finite Languages&#8221;
+for the source of this algorithm (Campeanu, Paun, Santean, and Yu). We follow their
+algorithm exactly, except that &#8220;l&#8221; is optionally calculated for you, and the state-
+ordering is automatically created.</p>
+<p>There exists a faster, O(n*logn)-time algorithm due to Korner, from CIAA 2002.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.collapse">
+<tt class="descname">collapse</tt><big>(</big><em>partition</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.collapse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.collapse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a partition of the DFA&#8217;s states into equivalence classes,
+collapses every equivalence class into a single &#8220;representative&#8221; state.
+Returns the hash mapping each old state to its new representative.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of the DFA. No data is shared with the original.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.delete_unreachable">
+<tt class="descname">delete_unreachable</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.delete_unreachable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.delete_unreachable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes all the unreachable states.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.f_equivalence_classes">
+<tt class="descname">f_equivalence_classes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.f_equivalence_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.f_equivalence_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a partition of the states into finite-difference equivalence clases, using
+the experimental O(n^2) algorithm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.hyper_minimize">
+<tt class="descname">hyper_minimize</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.hyper_minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.hyper_minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alters the DFA into a smallest possible DFA recognizing a finitely different language.
+In other words, if D is the original DFA and D&#8217; the result of this function, then the
+symmetric difference of L(D) and L(D&#8217;) will be a finite set, and there exists no smaller
+automaton than D&#8217; with this property.</p>
+<p>See &#8220;The DFAs of Finitely Different Regular Languages&#8221; for context.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.input">
+<tt class="descname">input</tt><big>(</big><em>char</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the state resulting on a single character of input based on current state. This function does not change self.current_state.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.is_finite">
+<tt class="descname">is_finite</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.is_finite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.is_finite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether the DFA&#8217;s language is a finite set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.levels">
+<tt class="descname">levels</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.levels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.levels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary mapping each state to its distance from the starting state.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.longest_word_length">
+<tt class="descname">longest_word_length</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.longest_word_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.longest_word_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a DFA recognizing a finite language, returns the length of the
+longest word in that language, or None if the language is empty.
+Assumes the input is minimized.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.minimize">
+<tt class="descname">minimize</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Classical DFA minimization, using the simple O(n^2) algorithm.
+Side effect: can mix up the internal ordering of states.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.mn_classes">
+<tt class="descname">mn_classes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.mn_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.mn_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a partition of self.states into Myhill-Nerode equivalence classes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.pluck_leaves">
+<tt class="descname">pluck_leaves</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.pluck_leaves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.pluck_leaves" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only for minimized automata. Returns a topologically ordered list of
+all the states that induce a finite language. Runs in linear time.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.preamble_and_kernel">
+<tt class="descname">preamble_and_kernel</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.preamble_and_kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.preamble_and_kernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the partition of the state-set into the preamble and
+kernel as a 2-tuple. A state is in the preamble iff there
+are finitely many strings that reach it from the start state.</p>
+<p>See &#8220;The DFAs of Finitely Different Regular Languages&#8221; for context.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.reachable">
+<tt class="descname">reachable</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.reachable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.reachable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the reachable subset of the DFA&#8217;s states.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.reachable_from">
+<tt class="descname">reachable_from</tt><big>(</big><em>q0</em>, <em>inclusive=True</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.reachable_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.reachable_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the set of states reachable from given state q0. The optional
+parameter &#8220;inclusive&#8221; indicates that q0 should always be included.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.recognizes">
+<tt class="descname">recognizes</tt><big>(</big><em>char_sequence</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.recognizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.recognizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether the DFA accepts a given string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.reset">
+<tt class="descname">reset</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the DFA to the starting state.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.right_finite_states">
+<tt class="descname">right_finite_states</tt><big>(</big><em>sink_states</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.right_finite_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.right_finite_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a DFA (self) and a list of states (sink_states) that are assumed to induce the
+empty language, return the topologically-ordered set of states in the DFA that induce
+finite languages.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.state_hash">
+<tt class="descname">state_hash</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.state_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.state_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a hash with one key for every state in the DFA, and
+all values initialized to the &#8216;value&#8217; passed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.state_merge">
+<tt class="descname">state_merge</tt><big>(</big><em>q1</em>, <em>q2</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.state_merge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.state_merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges q1 into q2. All transitions to q1 are moved to q2.
+If q1 was the start or current state, those are also moved to q2.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.states_fd_equivalent">
+<tt class="descname">states_fd_equivalent</tt><big>(</big><em>q1</em>, <em>q2</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.states_fd_equivalent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.states_fd_equivalent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether q1 and q2 only have finitely many distinguishing strings.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.status">
+<tt class="descname">status</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether the DFA&#8217;s current state is accepting.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.step">
+<tt class="descname">step</tt><big>(</big><em>char</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the DFA&#8217;s current state based on a single character of input.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.step_sequence">
+<tt class="descname">step_sequence</tt><big>(</big><em>char_sequence</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.step_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.step_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the DFA&#8217;s current state based on an iterable of inputs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.validate">
+<tt class="descname">validate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that:
+(1) The accepting-state set is a subset of the state set.
+(2) The start-state is a member of the state set.
+(3) The current-state is a member of the state set.
+(4) Every transition returns a member of the state set.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="DFA.cross_product">
+<tt class="descclassname">DFA.</tt><tt class="descname">cross_product</tt><big>(</big><em>D1</em>, <em>D2</em>, <em>accept_method</em><big>)</big><a class="reference internal" href="_modules/DFA.html#cross_product"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.cross_product" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generalized cross-product constructor over two DFAs.
+The third argument is a binary boolean function f; a state (q1, q2) in the final
+DFA accepts if f(A[q1],A[q2]), where A indicates the acceptance-value of the state.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="DFA.equals">
+<tt class="descclassname">DFA.</tt><tt class="descname">equals</tt><big>(</big><em>D1</em>, <em>D2</em><big>)</big><a class="reference internal" href="_modules/DFA.html#equals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.equals" title="Permalink to this definition">¶</a></dt>
+<dd><p>T</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="DFA.from_word_list">
+<tt class="descclassname">DFA.</tt><tt class="descname">from_word_list</tt><big>(</big><em>language</em>, <em>alphabet</em><big>)</big><a class="reference internal" href="_modules/DFA.html#from_word_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.from_word_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs an unminimized DFA accepting the given finite language.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="DFA.intersection">
+<tt class="descclassname">DFA.</tt><tt class="descname">intersection</tt><big>(</big><em>D1</em>, <em>D2</em><big>)</big><a class="reference internal" href="_modules/DFA.html#intersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs an unminimized DFA recognizing the intersection of the languages of two given DFAs.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="DFA.inverse">
+<tt class="descclassname">DFA.</tt><tt class="descname">inverse</tt><big>(</big><em>D</em><big>)</big><a class="reference internal" href="_modules/DFA.html#inverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs an unminimized DFA recognizing the inverse of the language of a given DFA.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="DFA.modular_zero">
+<tt class="descclassname">DFA.</tt><tt class="descname">modular_zero</tt><big>(</big><em>n</em>, <em>base=2</em><big>)</big><a class="reference internal" href="_modules/DFA.html#modular_zero"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.modular_zero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a DFA that accepts all binary numbers equal to 0 mod n. Use the optional
+parameter &#8220;base&#8221; if you want something other than binary. The empty string is also
+included in the DFA&#8217;s language.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="DFA.random">
+<tt class="descclassname">DFA.</tt><tt class="descname">random</tt><big>(</big><em>states_size</em>, <em>alphabet_size</em>, <em>acceptance=0.5</em><big>)</big><a class="reference internal" href="_modules/DFA.html#random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a random DFA with &#8220;states_size&#8221; states and &#8220;alphabet_size&#8221; inputs. Each
+transition destination is chosen uniformly at random, so the resultant DFA may have
+unreachable states. The optional &#8220;acceptance&#8221; parameter indicates what fraction of
+the states should be accepting.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="DFA.symmetric_difference">
+<tt class="descclassname">DFA.</tt><tt class="descname">symmetric_difference</tt><big>(</big><em>D1</em>, <em>D2</em><big>)</big><a class="reference internal" href="_modules/DFA.html#symmetric_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.symmetric_difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs an unminimized DFA recognizing the symmetric difference of the languages of two given DFAs.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="DFA.union">
+<tt class="descclassname">DFA.</tt><tt class="descname">union</tt><big>(</big><em>D1</em>, <em>D2</em><big>)</big><a class="reference internal" href="_modules/DFA.html#union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.union" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs an unminimized DFA recognizing the union of the languages of two given DFAs.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to python-automata&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="credits.html"
+                        title="next chapter">Credits</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/DFA.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="credits.html" title="Credits"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to python-automata’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">python_automata 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Vincent Antaki &amp; andrewbadr.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

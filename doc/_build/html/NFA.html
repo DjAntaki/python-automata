@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>NFA &mdash; python_automata 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="python_automata 2.0 documentation" href="index.html" />
+    <link rel="next" title="NFA" href="regexToNFA.html" />
+    <link rel="prev" title="DFA" href="DFA.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="regexToNFA.html" title="NFA"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DFA.html" title="DFA"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">python_automata 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="nfa">
+<h1>NFA<a class="headerlink" href="#nfa" title="Permalink to this headline">¶</a></h1>
+<p>Paragraphe au debut</p>
+<span class="target" id="module-NFA"></span><dl class="class">
+<dt id="NFA.NFA">
+<em class="property">class </em><tt class="descclassname">NFA.</tt><tt class="descname">NFA</tt><big>(</big><em>states</em>, <em>alphabet</em>, <em>delta</em>, <em>start</em>, <em>accepts</em>, <em>epsilon='epi'</em><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class represents a non-deterministic finite automaton.</p>
+<dl class="method">
+<dt id="NFA.NFA.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of the NFA. No data is shared with the original.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="NFA.NFA.input">
+<tt class="descname">input</tt><big>(</big><em>char</em><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the states resulting on a single character of input based on current state. This function does not change self.current_state.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="NFA.NFA.input_sequence">
+<tt class="descname">input_sequence</tt><big>(</big><em>char_sequence</em><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.input_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.input_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the NFA&#8217;s current state based on an iterable of inputs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="NFA.NFA.recognizes">
+<tt class="descname">recognizes</tt><big>(</big><em>char_sequence</em><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.recognizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.recognizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether the NFA accepts a given string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="NFA.NFA.reset">
+<tt class="descname">reset</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the NFA to the starting state.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="NFA.NFA.status">
+<tt class="descname">status</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether one of the NFA&#8217;s current state is accepting.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="NFA.NFA.step">
+<tt class="descname">step</tt><big>(</big><em>char</em><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the NFA&#8217;s current state(s) based on a single character of input.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="NFA.NFA.toDFA">
+<tt class="descname">toDFA</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.toDFA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.toDFA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an unminimized DFA that accepts the same language as th NFA instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="NFA.NFA.validate">
+<tt class="descname">validate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that:
+(1) The accepting-state set is a subset of the state set.
+(2) The start-state is a member of the state set.
+(3) The current-state is a member of the state set.
+(4) Every transition returns a set of members of the state set.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="DFA.html"
+                        title="previous chapter">DFA</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="regexToNFA.html"
+                        title="next chapter">NFA</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/NFA.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="regexToNFA.html" title="NFA"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DFA.html" title="DFA"
+             >previous</a> |</li>
+        <li><a href="index.html">python_automata 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Vincent Antaki &amp; andrewbadr.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

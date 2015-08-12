@@ -1,0 +1,732 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>DFA &mdash; python_automata 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="python_automata 2.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">python_automata 2.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for DFA</h1><div class="highlight"><pre>
+<span class="c"># python-automata, the Python DFA library</span>
+<span class="c"># License: New BSD License</span>
+<span class="c"># Author: Andrew Badr</span>
+<span class="c"># Version: July 17, 2008</span>
+<span class="c"># Contact: andrewbadr@gmail.com</span>
+<span class="c"># Code contributions are welcome.</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+
+<span class="kn">import</span> <span class="nn">UnionFind</span>
+<span class="kn">from</span> <span class="nn">FiniteStateMachine</span> <span class="kn">import</span> <span class="n">FiniteStateMachine</span>
+
+
+<span class="c"># TODO: general code cleanup</span>
+<span class="c"># TODO: write tests</span>
+
+
+<div class="viewcode-block" id="DFA"><a class="viewcode-back" href="../DFA.html#DFA.DFA">[docs]</a><span class="k">class</span> <span class="nc">DFA</span><span class="p">(</span><span class="n">FiniteStateMachine</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class represents a deterministic finite automaton.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">accepts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The inputs to the class are as follows:</span>
+<span class="sd">         - states: An iterable containing the states of the DFA. States must be immutable.</span>
+<span class="sd">         - alphabet: An iterable containing the symbols in the DFA&#39;s alphabet. Symbols must be immutable.</span>
+<span class="sd">         - delta: A complete function from [states]x[alphabets]-&gt;[states].</span>
+<span class="sd">         - start: The state at which the DFA begins operation.</span>
+<span class="sd">         - accepts: A list containing the &quot;accepting&quot; or &quot;final&quot; states of the DFA.</span>
+
+<span class="sd">        Making delta a function rather than a transition table makes it much easier to define certain DFAs.</span>
+<span class="sd">        If you want to use a transition table, you can just do this:</span>
+<span class="sd">         delta = lambda q,c: transition_table[q][c]</span>
+<span class="sd">        One caveat is that the function should not depend on the value of &#39;states&#39; or &#39;accepts&#39;, since</span>
+<span class="sd">        these may be modified during minimization.</span>
+
+<span class="sd">        Finally, the names of states and inputs should be hashable. This generally means strings, numbers,</span>
+<span class="sd">        or tuples of hashables.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">accepts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">alphabet</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="n">start</span>
+
+<div class="viewcode-block" id="DFA.validate"><a class="viewcode-back" href="../DFA.html#DFA.DFA.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks that:</span>
+<span class="sd">        (1) The accepting-state set is a subset of the state set.</span>
+<span class="sd">        (2) The start-state is a member of the state set.</span>
+<span class="sd">        (3) The current-state is a member of the state set.</span>
+<span class="sd">        (4) Every transition returns a member of the state set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">char</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+</div>
+<div class="viewcode-block" id="DFA.copy"><a class="viewcode-back" href="../DFA.html#DFA.DFA.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a copy of the DFA. No data is shared with the original.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DFA</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">)</span>
+
+<span class="c">#</span>
+<span class="c"># Simulating execution:</span>
+<span class="c">#</span></div>
+<div class="viewcode-block" id="DFA.input"><a class="viewcode-back" href="../DFA.html#DFA.DFA.input">[docs]</a>    <span class="k">def</span> <span class="nf">input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the state resulting on a single character of input based on current state. This function does not change self.current_state. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">,</span> <span class="n">char</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DFA.step"><a class="viewcode-back" href="../DFA.html#DFA.DFA.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Updates the DFA&#39;s current state based on a single character of input.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">,</span> <span class="n">char</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DFA.step_sequence"><a class="viewcode-back" href="../DFA.html#DFA.DFA.step_sequence">[docs]</a>    <span class="k">def</span> <span class="nf">step_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_sequence</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Updates the DFA&#39;s current state based on an iterable of inputs.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">char_sequence</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DFA.status"><a class="viewcode-back" href="../DFA.html#DFA.DFA.status">[docs]</a>    <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indicates whether the DFA&#39;s current state is accepting.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DFA.reset"><a class="viewcode-back" href="../DFA.html#DFA.DFA.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the DFA to the starting state.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
+</div>
+<div class="viewcode-block" id="DFA.recognizes"><a class="viewcode-back" href="../DFA.html#DFA.DFA.recognizes">[docs]</a>    <span class="k">def</span> <span class="nf">recognizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_sequence</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indicates whether the DFA accepts a given string.&quot;&quot;&quot;</span>
+        <span class="n">state_save</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_sequence</span><span class="p">(</span><span class="n">char_sequence</span><span class="p">)</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="n">state_save</span>
+        <span class="k">return</span> <span class="n">valid</span>
+
+<span class="c">#</span>
+<span class="c"># Minimization methods and their helper functions</span>
+<span class="c">#</span></div>
+<div class="viewcode-block" id="DFA.state_hash"><a class="viewcode-back" href="../DFA.html#DFA.DFA.state_hash">[docs]</a>    <span class="k">def</span> <span class="nf">state_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a hash with one key for every state in the DFA, and</span>
+<span class="sd">        all values initialized to the &#39;value&#39; passed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Callable</span><span class="p">):</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">d</span>
+</div>
+<div class="viewcode-block" id="DFA.state_merge"><a class="viewcode-back" href="../DFA.html#DFA.DFA.state_merge">[docs]</a>    <span class="k">def</span> <span class="nf">state_merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Merges q1 into q2. All transitions to q1 are moved to q2.</span>
+<span class="sd">        If q1 was the start or current state, those are also moved to q2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">q1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">==</span> <span class="n">q1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="n">q2</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">==</span> <span class="n">q1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">q2</span>
+        <span class="n">transitions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span> <span class="c">#without q1</span>
+            <span class="n">transitions</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                <span class="nb">next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">char</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">next</span> <span class="o">==</span> <span class="n">q1</span><span class="p">:</span>
+                    <span class="nb">next</span> <span class="o">=</span> <span class="n">q2</span>
+                <span class="n">transitions</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="n">char</span><span class="p">]</span> <span class="o">=</span> <span class="nb">next</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="n">transitions</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="n">c</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="DFA.reachable_from"><a class="viewcode-back" href="../DFA.html#DFA.DFA.reachable_from">[docs]</a>    <span class="k">def</span> <span class="nf">reachable_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q0</span><span class="p">,</span> <span class="n">inclusive</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the set of states reachable from given state q0. The optional</span>
+<span class="sd">        parameter &quot;inclusive&quot; indicates that q0 should always be included.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">reached</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_hash</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inclusive</span><span class="p">:</span>
+            <span class="n">reached</span><span class="p">[</span><span class="n">q0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">to_process</span> <span class="o">=</span> <span class="p">[</span><span class="n">q0</span><span class="p">]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_process</span><span class="p">):</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">to_process</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                <span class="nb">next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">reached</span><span class="p">[</span><span class="nb">next</span><span class="p">]</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+                    <span class="n">reached</span><span class="p">[</span><span class="nb">next</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">to_process</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">q</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="k">if</span> <span class="n">reached</span><span class="p">[</span><span class="n">q</span><span class="p">]]</span>
+</div>
+<div class="viewcode-block" id="DFA.reachable"><a class="viewcode-back" href="../DFA.html#DFA.DFA.reachable">[docs]</a>    <span class="k">def</span> <span class="nf">reachable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the reachable subset of the DFA&#39;s states.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reachable_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DFA.delete_unreachable"><a class="viewcode-back" href="../DFA.html#DFA.DFA.delete_unreachable">[docs]</a>    <span class="k">def</span> <span class="nf">delete_unreachable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deletes all the unreachable states.&quot;&quot;&quot;</span>
+        <span class="n">reachable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reachable</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="n">reachable</span>
+        <span class="n">new_accepts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+                <span class="n">new_accepts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span> <span class="o">=</span> <span class="n">new_accepts</span>
+</div>
+<div class="viewcode-block" id="DFA.mn_classes"><a class="viewcode-back" href="../DFA.html#DFA.DFA.mn_classes">[docs]</a>    <span class="k">def</span> <span class="nf">mn_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a partition of self.states into Myhill-Nerode equivalence classes.&quot;&quot;&quot;</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">classes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span> <span class="o">!=</span> <span class="p">[]:</span>
+            <span class="n">classes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">)</span>
+        <span class="n">nonaccepts</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">nonaccepts</span> <span class="o">!=</span> <span class="p">[]:</span>
+            <span class="n">classes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nonaccepts</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">changed</span><span class="p">:</span>
+            <span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">:</span>
+                <span class="n">local_change</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                    <span class="n">next_class</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="n">new_class</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">cl</span><span class="p">:</span>
+                        <span class="nb">next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">next_class</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="nb">next</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+                                    <span class="n">next_class</span> <span class="o">=</span> <span class="n">c</span>
+                        <span class="k">elif</span> <span class="nb">next</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">next_class</span><span class="p">:</span>
+                            <span class="n">new_class</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                            <span class="n">changed</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="n">local_change</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">if</span> <span class="n">local_change</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                        <span class="n">old_class</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cl</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_class</span><span class="p">:</span>
+                                <span class="n">old_class</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                        <span class="n">classes</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span>
+                        <span class="n">classes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">old_class</span><span class="p">)</span>
+                        <span class="n">classes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_class</span><span class="p">)</span>
+                        <span class="k">break</span>
+        <span class="k">return</span> <span class="n">classes</span>
+</div>
+<div class="viewcode-block" id="DFA.collapse"><a class="viewcode-back" href="../DFA.html#DFA.DFA.collapse">[docs]</a>    <span class="k">def</span> <span class="nf">collapse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given a partition of the DFA&#39;s states into equivalence classes,</span>
+<span class="sd">        collapses every equivalence class into a single &quot;representative&quot; state.</span>
+<span class="sd">        Returns the hash mapping each old state to its new representative.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_states</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">new_start</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">new_delta</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">new_accepts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c">#alphabet stays the same</span>
+        <span class="n">new_current_state</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">state_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c">#build new_states, new_start, new_current_state:</span>
+        <span class="k">for</span> <span class="n">state_class</span> <span class="ow">in</span> <span class="n">partition</span><span class="p">:</span>
+            <span class="n">representative</span> <span class="o">=</span> <span class="n">state_class</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">new_states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">representative</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">state_class</span><span class="p">:</span>
+                <span class="n">state_map</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">representative</span>
+                <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+                    <span class="n">new_start</span> <span class="o">=</span> <span class="n">representative</span>
+                <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">:</span>
+                    <span class="n">new_current_state</span> <span class="o">=</span> <span class="n">representative</span>
+        <span class="c">#build new_accepts:</span>
+        <span class="k">for</span> <span class="n">acc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">acc</span> <span class="ow">in</span> <span class="n">new_states</span><span class="p">:</span>
+                <span class="n">new_accepts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
+        <span class="c">#build new_delta:</span>
+        <span class="n">transitions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">new_states</span><span class="p">:</span>
+            <span class="n">transitions</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                <span class="n">transitions</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="n">alpha</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)]</span>
+        <span class="n">new_delta</span> <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">transitions</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="n">a</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="n">new_states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">new_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">new_delta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span> <span class="o">=</span> <span class="n">new_accepts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="n">new_current_state</span>
+        <span class="k">return</span> <span class="n">state_map</span>
+</div>
+<div class="viewcode-block" id="DFA.minimize"><a class="viewcode-back" href="../DFA.html#DFA.DFA.minimize">[docs]</a>    <span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Classical DFA minimization, using the simple O(n^2) algorithm.</span>
+<span class="sd">        Side effect: can mix up the internal ordering of states.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#Step 1: Delete unreachable states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete_unreachable</span><span class="p">()</span>
+        <span class="c">#Step 2: Partition the states into equivalence classes</span>
+        <span class="n">classes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mn_classes</span><span class="p">()</span>
+        <span class="c">#Step 3: Construct the new DFA</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collapse</span><span class="p">(</span><span class="n">classes</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DFA.preamble_and_kernel"><a class="viewcode-back" href="../DFA.html#DFA.DFA.preamble_and_kernel">[docs]</a>    <span class="k">def</span> <span class="nf">preamble_and_kernel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the partition of the state-set into the preamble and</span>
+<span class="sd">        kernel as a 2-tuple. A state is in the preamble iff there</span>
+<span class="sd">        are finitely many strings that reach it from the start state.</span>
+
+<span class="sd">        See &quot;The DFAs of Finitely Different Regular Languages&quot; for context.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#O(n^2): can this be improved?</span>
+        <span class="n">reachable</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="n">reachable</span><span class="p">[</span><span class="n">q</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reachable_from</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">inclusive</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">in_fin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_hash</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">reachable</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">reachable</span><span class="p">[</span><span class="n">q</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="nb">next</span> <span class="ow">in</span> <span class="n">reachable</span><span class="p">[</span><span class="n">q</span><span class="p">]:</span>
+                    <span class="n">in_fin</span><span class="p">[</span><span class="nb">next</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">preamble</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="k">if</span> <span class="n">in_fin</span><span class="p">[</span><span class="n">x</span><span class="p">]]</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">in_fin</span><span class="p">[</span><span class="n">x</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">preamble</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DFA.pluck_leaves"><a class="viewcode-back" href="../DFA.html#DFA.DFA.pluck_leaves">[docs]</a>    <span class="k">def</span> <span class="nf">pluck_leaves</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Only for minimized automata. Returns a topologically ordered list of</span>
+<span class="sd">        all the states that induce a finite language. Runs in linear time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#Step 1: Build the states&#39; profiles</span>
+        <span class="n">loops</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_hash</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">inbound</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_hash</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">outbound</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_hash</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                <span class="nb">next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                <span class="n">inbound</span><span class="p">[</span><span class="nb">next</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="n">outbound</span><span class="p">[</span><span class="n">state</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="nb">next</span><span class="p">:</span>
+                    <span class="n">loops</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c">#Step 2: Add sink state to to_pluck</span>
+        <span class="n">to_pluck</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outbound</span><span class="p">[</span><span class="n">state</span><span class="p">])</span> <span class="o">==</span> <span class="n">loops</span><span class="p">[</span><span class="n">state</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">:</span>
+                    <span class="c">#prints(&quot;Adding &#39;%s&#39; to be plucked&quot; % state)</span>
+                    <span class="n">to_pluck</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="c">#Step 3: Pluck!</span>
+        <span class="n">plucked</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_pluck</span><span class="p">):</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">to_pluck</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="c">#prints(&quot;Plucking %s&quot; % state)</span>
+            <span class="n">plucked</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">incoming</span> <span class="ow">in</span> <span class="n">inbound</span><span class="p">[</span><span class="n">state</span><span class="p">]:</span>
+                <span class="c">#prints(&quot;Deleting %s-&gt;%s edge&quot; % (incoming, state))</span>
+                <span class="n">outbound</span><span class="p">[</span><span class="n">incoming</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">outbound</span><span class="p">[</span><span class="n">incoming</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">incoming</span> <span class="o">!=</span> <span class="n">state</span><span class="p">):</span>
+                    <span class="n">to_pluck</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">incoming</span><span class="p">)</span>
+                    <span class="c">#prints(&quot;Adding &#39;%s&#39; to be plucked&quot; % incoming)</span>
+        <span class="n">plucked</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">plucked</span>
+</div>
+<div class="viewcode-block" id="DFA.right_finite_states"><a class="viewcode-back" href="../DFA.html#DFA.DFA.right_finite_states">[docs]</a>    <span class="k">def</span> <span class="nf">right_finite_states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sink_states</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given a DFA (self) and a list of states (sink_states) that are assumed to induce the</span>
+<span class="sd">        empty language, return the topologically-ordered set of states in the DFA that induce</span>
+<span class="sd">        finite languages.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#Step 1: Build the states&#39; profiles</span>
+        <span class="n">inbound</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_hash</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">outbound</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_hash</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">sink_states</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                <span class="nb">next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                <span class="n">inbound</span><span class="p">[</span><span class="nb">next</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="n">outbound</span><span class="p">[</span><span class="n">state</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span>
+
+        <span class="c">#Step 2: Pluck!</span>
+        <span class="n">to_pluck</span> <span class="o">=</span> <span class="n">sink_states</span>
+        <span class="n">plucked</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_pluck</span><span class="p">):</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">to_pluck</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">plucked</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">incoming</span> <span class="ow">in</span> <span class="n">inbound</span><span class="p">[</span><span class="n">state</span><span class="p">]:</span>
+                <span class="n">outbound</span><span class="p">[</span><span class="n">incoming</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">outbound</span><span class="p">[</span><span class="n">incoming</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">incoming</span> <span class="o">!=</span> <span class="n">state</span><span class="p">):</span>
+                    <span class="n">to_pluck</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">incoming</span><span class="p">)</span>
+        <span class="n">plucked</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">plucked</span>
+</div>
+<div class="viewcode-block" id="DFA.is_finite"><a class="viewcode-back" href="../DFA.html#DFA.DFA.is_finite">[docs]</a>    <span class="k">def</span> <span class="nf">is_finite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indicates whether the DFA&#39;s language is a finite set.&quot;&quot;&quot;</span>
+        <span class="n">D2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">D2</span><span class="o">.</span><span class="n">minimize</span><span class="p">()</span>
+        <span class="n">plucked</span> <span class="o">=</span> <span class="n">D2</span><span class="o">.</span><span class="n">pluck_leaves</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">D2</span><span class="o">.</span><span class="n">start</span> <span class="ow">in</span> <span class="n">plucked</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DFA.states_fd_equivalent"><a class="viewcode-back" href="../DFA.html#DFA.DFA.states_fd_equivalent">[docs]</a>    <span class="k">def</span> <span class="nf">states_fd_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indicates whether q1 and q2 only have finitely many distinguishing strings.&quot;&quot;&quot;</span>
+        <span class="n">d1</span> <span class="o">=</span> <span class="n">DFA</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">q1</span><span class="p">,</span> <span class="n">accepts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span> <span class="n">alphabet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">)</span>
+        <span class="n">d2</span> <span class="o">=</span> <span class="n">DFA</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">q2</span><span class="p">,</span> <span class="n">accepts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span> <span class="n">alphabet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">)</span>
+        <span class="n">sd_dfa</span> <span class="o">=</span> <span class="n">symmetric_difference</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sd_dfa</span><span class="o">.</span><span class="n">is_finite</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="DFA.f_equivalence_classes"><a class="viewcode-back" href="../DFA.html#DFA.DFA.f_equivalence_classes">[docs]</a>    <span class="k">def</span> <span class="nf">f_equivalence_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a partition of the states into finite-difference equivalence clases, using</span>
+<span class="sd">        the experimental O(n^2) algorithm.&quot;&quot;&quot;</span>
+        <span class="n">sd</span> <span class="o">=</span> <span class="n">symmetric_difference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">self_pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">]</span>
+        <span class="n">fd_equiv_pairs</span> <span class="o">=</span> <span class="n">sd</span><span class="o">.</span><span class="n">right_finite_states</span><span class="p">(</span><span class="n">self_pairs</span><span class="p">)</span>
+        <span class="n">sets</span> <span class="o">=</span> <span class="n">UnionFind</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="n">sets</span><span class="o">.</span><span class="n">make_set</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">state1</span><span class="p">,</span> <span class="n">state2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">fd_equiv_pairs</span><span class="p">:</span>
+            <span class="n">set1</span><span class="p">,</span> <span class="n">set2</span> <span class="o">=</span> <span class="n">sets</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">state1</span><span class="p">),</span> <span class="n">sets</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">state2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">set1</span> <span class="o">!=</span> <span class="n">set2</span><span class="p">:</span>
+                <span class="n">sets</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">set1</span><span class="p">,</span> <span class="n">set2</span><span class="p">)</span>
+        <span class="n">state_classes</span> <span class="o">=</span> <span class="n">sets</span><span class="o">.</span><span class="n">as_lists</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">state_classes</span>
+</div>
+<div class="viewcode-block" id="DFA.hyper_minimize"><a class="viewcode-back" href="../DFA.html#DFA.DFA.hyper_minimize">[docs]</a>    <span class="k">def</span> <span class="nf">hyper_minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alters the DFA into a smallest possible DFA recognizing a finitely different language.</span>
+<span class="sd">        In other words, if D is the original DFA and D&#39; the result of this function, then the</span>
+<span class="sd">        symmetric difference of L(D) and L(D&#39;) will be a finite set, and there exists no smaller</span>
+<span class="sd">        automaton than D&#39; with this property.</span>
+
+<span class="sd">        See &quot;The DFAs of Finitely Different Regular Languages&quot; for context.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Step 1: Classical minimization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimize</span><span class="p">()</span>
+        <span class="c"># Step 2: Partition states into equivalence classes</span>
+        <span class="n">state_classes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_equivalence_classes</span><span class="p">()</span>
+        <span class="c"># Step 3: Find preamble and kernel parts</span>
+        <span class="p">(</span><span class="n">preamble</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preamble_and_kernel</span><span class="p">()</span>
+        <span class="c"># Step 4: Merge (f_merge_states in the paper)</span>
+        <span class="c"># (Could be done more efficiently)</span>
+        <span class="k">for</span> <span class="n">sc</span> <span class="ow">in</span> <span class="n">state_classes</span><span class="p">:</span>
+            <span class="n">pres</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sc</span> <span class="k">if</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">preamble</span><span class="p">]</span>
+            <span class="n">kers</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sc</span> <span class="k">if</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">kernel</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kers</span><span class="p">):</span>
+                <span class="n">rep</span> <span class="o">=</span> <span class="n">kers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">p_state</span> <span class="ow">in</span> <span class="n">pres</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">state_merge</span><span class="p">(</span><span class="n">p_state</span><span class="p">,</span> <span class="n">rep</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rep</span> <span class="o">=</span> <span class="n">pres</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">p_state</span> <span class="ow">in</span> <span class="n">pres</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">state_merge</span><span class="p">(</span><span class="n">p_state</span><span class="p">,</span> <span class="n">rep</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DFA.levels"><a class="viewcode-back" href="../DFA.html#DFA.DFA.levels">[docs]</a>    <span class="k">def</span> <span class="nf">levels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a dictionary mapping each state to its distance from the starting state.&quot;&quot;&quot;</span>
+        <span class="n">levels</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">seen</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">]</span>
+        <span class="n">levels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">level_number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">level_states</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">level_states</span><span class="p">):</span>
+            <span class="n">next_level_states</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">next_level_number</span> <span class="o">=</span> <span class="n">level_number</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">level_states</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                    <span class="nb">next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">next</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                        <span class="n">seen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span>
+                        <span class="n">levels</span><span class="p">[</span><span class="nb">next</span><span class="p">]</span> <span class="o">=</span> <span class="n">next_level_number</span>
+                        <span class="n">next_level_states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span>
+            <span class="n">level_states</span> <span class="o">=</span> <span class="n">next_level_states</span>
+            <span class="n">level_number</span> <span class="o">=</span> <span class="n">next_level_number</span>
+        <span class="k">return</span> <span class="n">levels</span>
+</div>
+<div class="viewcode-block" id="DFA.longest_word_length"><a class="viewcode-back" href="../DFA.html#DFA.DFA.longest_word_length">[docs]</a>    <span class="k">def</span> <span class="nf">longest_word_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given a DFA recognizing a finite language, returns the length of the</span>
+<span class="sd">        longest word in that language, or None if the language is empty.</span>
+<span class="sd">        Assumes the input is minimized.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_finite</span><span class="p">())</span>
+        <span class="k">def</span> <span class="nf">long_path</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">length</span><span class="p">,</span> <span class="n">longest</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="n">longest</span><span class="p">:</span>
+                    <span class="n">longest</span> <span class="o">=</span> <span class="n">length</span>
+            <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                <span class="nb">next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">char</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">next</span> <span class="o">!=</span> <span class="n">q</span><span class="p">:</span>
+                    <span class="n">candidate</span> <span class="o">=</span> <span class="n">long_path</span><span class="p">(</span><span class="nb">next</span><span class="p">,</span> <span class="n">length</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">longest</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">candidate</span> <span class="o">&gt;</span> <span class="n">longest</span><span class="p">:</span>
+                        <span class="n">longest</span> <span class="o">=</span> <span class="n">candidate</span>
+            <span class="k">return</span> <span class="n">longest</span>
+        <span class="k">return</span> <span class="n">long_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DFA.DFCA_minimize"><a class="viewcode-back" href="../DFA.html#DFA.DFA.DFCA_minimize">[docs]</a>    <span class="k">def</span> <span class="nf">DFCA_minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;DFCA minimization&quot;</span>
+<span class="sd">        Input: &quot;self&quot; is a DFA accepting a finite language</span>
+<span class="sd">        Result: &quot;self&quot; is DFCA-minimized, and the returned value is the length of the longest</span>
+<span class="sd">                word accepted by the original DFA</span>
+
+<span class="sd">        See &quot;Minimal cover-automata for finite languages&quot; for context on DFCAs, and</span>
+<span class="sd">        &quot;An O(n^2) Algorithm for Constructing Minimal Cover Automata for Finite Languages&quot;</span>
+<span class="sd">        for the source of this algorithm (Campeanu, Paun, Santean, and Yu). We follow their</span>
+<span class="sd">        algorithm exactly, except that &quot;l&quot; is optionally calculated for you, and the state-</span>
+<span class="sd">        ordering is automatically created.</span>
+
+<span class="sd">        There exists a faster, O(n*logn)-time algorithm due to Korner, from CIAA 2002.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_finite</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimize</span><span class="p">()</span>
+
+        <span class="c">###Step 0: Numbering the states and computing &quot;l&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">state_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pluck_leaves</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">l</span><span class="o">==</span><span class="bp">None</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">longest_word_length</span><span class="p">()</span>
+        <span class="c">#We&#39;re giving each state a numerical name so that the  algorithm can</span>
+        <span class="c"># run on an &quot;ordered&quot; DFA -- see the paper for why. These functions</span>
+        <span class="c"># allow us to copiously convert between names.</span>
+        <span class="k">def</span> <span class="nf">nn</span><span class="p">(</span><span class="n">q</span><span class="p">):</span> <span class="c"># &quot;numerical name&quot;</span>
+            <span class="k">return</span> <span class="n">state_order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">rn</span><span class="p">(</span><span class="n">n</span><span class="p">):</span> <span class="c"># &quot;real name&quot;</span>
+            <span class="k">return</span> <span class="n">state_order</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+
+        <span class="c">###Step 1: Computing the gap function</span>
+        <span class="c"># 1.1 -- Step numbering is from the paper</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">()</span> <span class="c">#holds real names</span>
+        <span class="n">gap</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c">#holds numerical names</span>
+        <span class="c"># 1.2</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">gap</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">)]</span> <span class="o">=</span> <span class="n">l</span>
+        <span class="k">if</span> <span class="n">level</span><span class="p">[</span><span class="n">rn</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span> <span class="o">&lt;=</span> <span class="n">l</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">:</span>
+                <span class="n">gap</span><span class="p">[(</span><span class="n">nn</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">n</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c"># 1.3</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">rn</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">)</span><span class="o">^</span><span class="p">(</span><span class="n">rn</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">):</span>
+                    <span class="n">gap</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">gap</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">l</span>
+        <span class="c"># 1.4</span>
+        <span class="k">def</span> <span class="nf">level_range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">l</span> <span class="o">-</span> <span class="nb">max</span><span class="p">(</span><span class="n">level</span><span class="p">[</span><span class="n">rn</span><span class="p">(</span><span class="n">i</span><span class="p">)],</span> <span class="n">level</span><span class="p">[</span><span class="n">rn</span><span class="p">(</span><span class="n">j</span><span class="p">)])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                    <span class="n">i2</span> <span class="o">=</span> <span class="n">nn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">rn</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">char</span><span class="p">))</span>
+                    <span class="n">j2</span> <span class="o">=</span> <span class="n">nn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">rn</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="n">char</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">i2</span> <span class="o">!=</span> <span class="n">j2</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">i2</span> <span class="o">&lt;</span> <span class="n">j2</span><span class="p">:</span>
+                            <span class="n">g</span> <span class="o">=</span> <span class="n">gap</span><span class="p">[(</span><span class="n">i2</span><span class="p">,</span> <span class="n">j2</span><span class="p">)]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">g</span> <span class="o">=</span> <span class="n">gap</span><span class="p">[(</span><span class="n">j2</span><span class="p">,</span> <span class="n">i2</span><span class="p">)]</span>
+                        <span class="k">if</span> <span class="n">g</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">level_range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+                            <span class="n">gap</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">gap</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)],</span> <span class="n">g</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c">###Step 2: Merging states</span>
+        <span class="c"># 2.1</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c"># 2.2</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="bp">False</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">gap</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)]</span> <span class="o">==</span> <span class="n">l</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">state_merge</span><span class="p">(</span><span class="n">rn</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="n">rn</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                        <span class="n">P</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="n">l</span>
+
+
+
+<span class="c">#</span>
+<span class="c"># Boolean set operations on languages -- end of the DFA class</span>
+<span class="c">#</span>
+</div></div>
+<div class="viewcode-block" id="cross_product"><a class="viewcode-back" href="../DFA.html#DFA.cross_product">[docs]</a><span class="k">def</span> <span class="nf">cross_product</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span> <span class="n">D2</span><span class="p">,</span> <span class="n">accept_method</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A generalized cross-product constructor over two DFAs.</span>
+<span class="sd">    The third argument is a binary boolean function f; a state (q1, q2) in the final</span>
+<span class="sd">    DFA accepts if f(A[q1],A[q2]), where A indicates the acceptance-value of the state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">D1</span><span class="o">.</span><span class="n">alphabet</span> <span class="o">==</span> <span class="n">D2</span><span class="o">.</span><span class="n">alphabet</span><span class="p">)</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s1</span> <span class="ow">in</span> <span class="n">D1</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">s2</span> <span class="ow">in</span> <span class="n">D2</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="n">states</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">))</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">D1</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">D2</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">delta</span><span class="p">(</span><span class="n">state_pair</span><span class="p">,</span> <span class="n">char</span><span class="p">):</span>
+        <span class="n">next_D1</span> <span class="o">=</span> <span class="n">D1</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">state_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">char</span><span class="p">)</span>
+        <span class="n">next_D2</span> <span class="o">=</span> <span class="n">D2</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">state_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">char</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">next_D1</span><span class="p">,</span> <span class="n">next_D2</span><span class="p">)</span>
+    <span class="n">alphabet</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">D1</span><span class="o">.</span><span class="n">alphabet</span><span class="p">)</span>
+    <span class="n">accepts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
+        <span class="n">a1</span> <span class="o">=</span> <span class="n">s1</span> <span class="ow">in</span> <span class="n">D1</span><span class="o">.</span><span class="n">accepts</span>
+        <span class="n">a2</span> <span class="o">=</span> <span class="n">s2</span> <span class="ow">in</span> <span class="n">D2</span><span class="o">.</span><span class="n">accepts</span>
+        <span class="k">if</span> <span class="n">accept_method</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">):</span>
+            <span class="n">accepts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">DFA</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="n">states</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span> <span class="n">accepts</span><span class="o">=</span><span class="n">accepts</span><span class="p">,</span> <span class="n">alphabet</span><span class="o">=</span><span class="n">alphabet</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="intersection"><a class="viewcode-back" href="../DFA.html#DFA.intersection">[docs]</a><span class="k">def</span> <span class="nf">intersection</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span> <span class="n">D2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constructs an unminimized DFA recognizing the intersection of the languages of two given DFAs.&quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">bool</span><span class="o">.</span><span class="n">__and__</span>
+    <span class="k">return</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span> <span class="n">D2</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="union"><a class="viewcode-back" href="../DFA.html#DFA.union">[docs]</a><span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span> <span class="n">D2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constructs an unminimized DFA recognizing the union of the languages of two given DFAs.&quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">bool</span><span class="o">.</span><span class="n">__or__</span>
+    <span class="k">return</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span> <span class="n">D2</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="symmetric_difference"><a class="viewcode-back" href="../DFA.html#DFA.symmetric_difference">[docs]</a><span class="k">def</span> <span class="nf">symmetric_difference</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span> <span class="n">D2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constructs an unminimized DFA recognizing the symmetric difference of the languages of two given DFAs.&quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">bool</span><span class="o">.</span><span class="n">__xor__</span>
+    <span class="k">return</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span> <span class="n">D2</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="inverse"><a class="viewcode-back" href="../DFA.html#DFA.inverse">[docs]</a><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="n">D</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constructs an unminimized DFA recognizing the inverse of the language of a given DFA.&quot;&quot;&quot;</span>
+    <span class="n">new_accepts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">D</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">D</span><span class="o">.</span><span class="n">accepts</span><span class="p">:</span>
+            <span class="n">new_accepts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">DFA</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span> <span class="n">accepts</span><span class="o">=</span><span class="n">new_accepts</span><span class="p">,</span> <span class="n">alphabet</span><span class="o">=</span><span class="n">D</span><span class="o">.</span><span class="n">alphabet</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="equals"><a class="viewcode-back" href="../DFA.html#DFA.equals">[docs]</a><span class="k">def</span> <span class="nf">equals</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span> <span class="n">D2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;T&quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">symmetric_difference</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span><span class="n">D2</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">is_finite</span><span class="p">()</span> <span class="ow">and</span> <span class="n">d</span><span class="o">.</span><span class="n">longest_word_length</span><span class="p">()</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+
+<span class="c">#</span>
+<span class="c"># Constructing new DFAs</span>
+<span class="c">#</span>
+</div>
+<div class="viewcode-block" id="from_word_list"><a class="viewcode-back" href="../DFA.html#DFA.from_word_list">[docs]</a><span class="k">def</span> <span class="nf">from_word_list</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constructs an unminimized DFA accepting the given finite language.&quot;&quot;&quot;</span>
+    <span class="n">accepts</span> <span class="o">=</span> <span class="n">language</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">sink</span> <span class="o">=</span> <span class="s">&#39;sink&#39;</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="n">start</span><span class="p">,</span> <span class="n">sink</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">language</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)):</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="n">word</span><span class="p">[:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">prefix</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
+                <span class="n">states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="n">fwl</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">delta</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="nb">next</span> <span class="o">=</span> <span class="n">q</span><span class="o">+</span><span class="n">c</span>
+        <span class="k">if</span> <span class="nb">next</span> <span class="ow">in</span> <span class="n">fwl</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">next</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sink</span>
+    <span class="k">return</span> <span class="n">DFA</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="n">states</span><span class="p">,</span> <span class="n">alphabet</span><span class="o">=</span><span class="n">alphabet</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">accepts</span><span class="o">=</span><span class="n">accepts</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="modular_zero"><a class="viewcode-back" href="../DFA.html#DFA.modular_zero">[docs]</a><span class="k">def</span> <span class="nf">modular_zero</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a DFA that accepts all binary numbers equal to 0 mod n. Use the optional</span>
+<span class="sd">    parameter &quot;base&quot; if you want something other than binary. The empty string is also</span>
+<span class="sd">    included in the DFA&#39;s language.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+    <span class="n">alphabet</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">base</span><span class="p">))))</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">q</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="p">((</span><span class="n">q</span><span class="o">*</span><span class="n">base</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">))</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">accepts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">DFA</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="n">states</span><span class="p">,</span> <span class="n">alphabet</span><span class="o">=</span><span class="n">alphabet</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">accepts</span><span class="o">=</span><span class="n">accepts</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="random"><a class="viewcode-back" href="../DFA.html#DFA.random">[docs]</a><span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="n">states_size</span><span class="p">,</span> <span class="n">alphabet_size</span><span class="p">,</span> <span class="n">acceptance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constructs a random DFA with &quot;states_size&quot; states and &quot;alphabet_size&quot; inputs. Each</span>
+<span class="sd">    transition destination is chosen uniformly at random, so the resultant DFA may have</span>
+<span class="sd">    unreachable states. The optional &quot;acceptance&quot; parameter indicates what fraction of</span>
+<span class="sd">    the states should be accepting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">random</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">states_size</span><span class="p">))</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">alphabet</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">alphabet_size</span><span class="p">))</span>
+    <span class="n">accepts</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">acceptance</span><span class="o">*</span><span class="n">states_size</span><span class="p">))</span>
+    <span class="n">tt</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
+        <span class="n">tt</span><span class="p">[</span><span class="n">q</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">alphabet</span><span class="p">:</span>
+            <span class="n">tt</span><span class="p">[</span><span class="n">q</span><span class="p">][</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">q</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="n">tt</span><span class="p">[</span><span class="n">q</span><span class="p">][</span><span class="n">c</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">DFA</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">accepts</span><span class="p">)</span>
+
+<span class="c">#</span>
+<span class="c"># Finite-factoring</span>
+<span class="c">#</span>
+</div>
+<span class="k">def</span> <span class="nf">finite_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">D1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">D1</span><span class="o">.</span><span class="n">minimize</span><span class="p">()</span>
+    <span class="n">D2</span> <span class="o">=</span> <span class="n">D1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">D2</span><span class="o">.</span><span class="n">hyper_minimize</span><span class="p">()</span>
+    <span class="n">D3</span> <span class="o">=</span> <span class="n">symmetric_difference</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span> <span class="n">D2</span><span class="p">)</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">D3</span><span class="o">.</span><span class="n">DFCA_minimize</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">D2</span><span class="p">,</span> <span class="p">(</span><span class="n">D3</span><span class="p">,</span> <span class="n">l</span><span class="p">))</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">python_automata 2.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Vincent Antaki &amp; andrewbadr.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

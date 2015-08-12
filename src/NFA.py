@@ -1,5 +1,5 @@
-import FiniteStateMachine
-import DFA
+from FiniteStateMachine import FiniteStateMachine
+from DFA import DFA
 
 
 class NFA(FiniteStateMachine):
@@ -62,7 +62,7 @@ class NFA(FiniteStateMachine):
                     assert a in self.states
 
     def copy(self):
-        """Returns a copy of the DFA. No data is shared with the original."""
+        """Returns a copy of the NFA. No data is shared with the original."""
         return NFA(self.states, self.alphabet, self.delta, self.start, self.accepts, self.EPSILON)
 
 #
@@ -106,7 +106,7 @@ class NFA(FiniteStateMachine):
                 s = x
 
     def input_sequence(self, char_sequence):
-        """Updates the DFA's current state based on an iterable of inputs."""
+        """Updates the NFA's current state based on an iterable of inputs."""
         if char_sequence != self.EPSILON:
             for char in char_sequence:
                 self.step(char)
@@ -131,7 +131,7 @@ class NFA(FiniteStateMachine):
 
     def toDFA(self):
         """
-        Returns an unminimized DFA that accepts the same language as this NFA.
+        Returns an unminimized DFA that accepts the same language as th NFA instance.
         """
         saved_state = self.current_state
         self.reset()

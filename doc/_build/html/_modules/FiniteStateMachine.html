@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>FiniteStateMachine &mdash; python_automata 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="python_automata 2.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">python_automata 2.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for FiniteStateMachine</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="c"># Some small utils</span>
+
+<span class="k">class</span> <span class="nc">FiniteStateMachine</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">getAlphabet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a set containing the alphabet.</span>
+<span class="sd">        If the FSM is non-deterministic, this function does not return the epsilon symbol.</span>
+<span class="sd">        if you actually want the alphabet with the epsilon, use self.alphabet</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">NFA</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="n">NFA</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span> <span class="o">-</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSILON</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span>
+
+    <span class="k">def</span> <span class="nf">get_transition_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the transition table from the function self.delta defined on [states] X [alphabet] -&gt; ([states])*</span>
+<span class="sd">        Returns a dictionnary of states where each element is a dictionnary with (key,value) = [alphabet],[states]</span>
+
+<span class="sd">        \&gt;&gt;&gt; x = NFA(state=set() )</span>
+<span class="sd">        \&gt;&gt;&gt; t = x.get_transition_table()</span>
+<span class="sd">        \&gt;&gt;&gt; t[0][&#39;a&#39;]</span>
+<span class="sd">            1</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                <span class="c">#        d[x].update(map(lambda c: (c,func(x, c)), alphabet.copy()))</span>
+        <span class="k">return</span> <span class="n">d</span>
+
+    <span class="k">def</span> <span class="nf">accepted_under_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_length</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Try all words of length &lt; than input and return the list of those accepted.&quot;&quot;&quot;</span>
+        <span class="n">accepted_words_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getAlphabet</span><span class="p">(),</span> <span class="n">repeat</span><span class="o">=</span><span class="n">x</span><span class="p">):</span>
+                <span class="n">entree</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="n">entree</span><span class="p">):</span>
+                    <span class="n">accepted_words_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entree</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">accepted_words_list</span>
+
+
+    <span class="k">def</span> <span class="nf">accepted_under_word</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_word</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Enumerate all the accepted word. Which does not makes much sense</span>
+<span class="sd">        to me when the alphabet is a unordered set of element.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">accepted_words_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">max_word</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getAlphabet</span><span class="p">(),</span> <span class="n">repeat</span><span class="o">=</span><span class="n">x</span><span class="p">):</span>
+                <span class="n">entree</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="n">entree</span><span class="p">):</span>
+                    <span class="n">accepted_words_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entree</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">entree</span> <span class="o">==</span> <span class="n">max_word</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+        <span class="k">return</span> <span class="n">accepted_words_list</span>
+
+<span class="c">#</span>
+<span class="c">#   To modify an FSM:</span>
+<span class="c">#</span>
+
+    <span class="k">def</span> <span class="nf">remap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q0</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function changes the output of one transition</span>
+<span class="sd">        q0 : the initial state</span>
+<span class="sd">        a : a symbol of the alphabet</span>
+<span class="sd">        q : the final states. Can be an object or a set of objects</span>
+
+<span class="sd">        q0 -a-&gt; set([q])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="n">q0</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+        <span class="k">assert</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span>
+        <span class="k">assert</span> <span class="n">q</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_transition_table</span><span class="p">()</span>
+        <span class="n">table</span><span class="p">[</span><span class="n">q0</span><span class="p">][</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">c</span> <span class="p">:</span> <span class="n">table</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">c</span><span class="p">]</span>
+
+
+<span class="c">#</span>
+<span class="c"># Administrative functions:</span>
+<span class="c">#</span>
+
+    <span class="k">def</span> <span class="nf">pretty_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Displays all information about the NFA in an easy-to-read way. Not</span>
+<span class="sd">        actually that easy to read if it has too many states.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;This FSM has </span><span class="si">%s</span><span class="s"> states&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Type : &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;States:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Alphabet:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Starting state:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Accepting states:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Transition function:&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">))))</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">results</span><span class="p">)))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Current state:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Currently accepting:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">())</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">pretty_print2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">str2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="nb">set</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">==</span> <span class="nb">frozenset</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s">&#39;(&#39;</span><span class="o">+</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;, &quot;</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;)&#39;</span>
+            <span class="k">else</span> <span class="p">:</span> <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;This FSM has </span><span class="si">%s</span><span class="s"> states&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Type : &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;States:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Alphabet:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Starting state:&quot;</span><span class="p">,</span> <span class="n">str2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Accepting states:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Transition table:&quot;</span><span class="p">)</span>
+
+        <span class="n">tmp</span> <span class="o">=</span> <span class="s">&quot;{&quot;</span>
+        <span class="n">transition_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_transition_table</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">):</span>
+            <span class="n">tmp</span> <span class="o">+=</span> <span class="n">str2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;:{&quot;</span><span class="o">+</span><span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;:&quot;</span><span class="o">+</span><span class="s">&#39;{&#39;</span><span class="o">+</span><span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">str2</span><span class="p">(</span><span class="n">transition_table</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">c</span><span class="p">])])</span><span class="o">+</span><span class="s">&#39;}&#39;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">])</span><span class="o">+</span><span class="s">&quot;},</span><span class="se">\n</span><span class="s">&quot;</span>
+           <span class="c"># tmp += str2(x)+&quot;:{&quot;+&quot;, &quot;.join([str(c)+&quot;:&quot;+str2(transition_table[x][c]) for c in self.alphabet])+&quot;},\n&quot;</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="s">&quot;}&quot;</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Current state:&quot;</span><span class="p">,</span> <span class="n">str2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Currently accepting:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">())</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="save_machine"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.save_machine">[docs]</a><span class="k">def</span> <span class="nf">save_machine</span><span class="p">(</span><span class="n">FA</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Saves a single automaton&quot;&quot;&quot;</span>
+
+    <span class="n">FA</span> <span class="o">=</span> <span class="n">FA</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c"># Pickle cannot serialize lambda functions. We will instead serialize a transition table of the function.</span>
+    <span class="n">FA</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">FA</span><span class="o">.</span><span class="n">get_transition_table</span><span class="p">()</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">Pickler</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">FA</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Saved object at &quot;</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="load_machine"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.load_machine">[docs]</a><span class="k">def</span> <span class="nf">load_machine</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Loads a single automaton &quot;&quot;&quot;</span>
+    <span class="n">FA</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">))</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">FA</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c"># Make the transition table a lambda function.</span>
+    <span class="n">FA</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">c</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">FA</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">python_automata 2.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Vincent Antaki &amp; andrewbadr.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

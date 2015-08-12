@@ -9,7 +9,12 @@ from src import FiniteStateMachine
 saved = {}
 
 def save_prompt(FA):
-    x = input("If you want to save this state machine, please enter a path. \n"+
+    """
+    Interactive prompt for saving a Finite automaton.
+    :param FA:
+    :return:
+    """
+    x = raw_input("If you want to save this finite state machine, please enter a path. \n"+
               "If you do not want to save, press enter.")
 
     if x == '':
@@ -18,14 +23,17 @@ def save_prompt(FA):
         FiniteStateMachine.save_machine(FA,x)
 
 def dfa_input():
-
+    """
+    Interactive prompt for initializing a DFA
+    :return: a DFA
+    """
     print("Welcome to the DFA prompt")
     while(True):
         print("Enter a label for your DFA :")
-        label = input()
+        label = raw_input()
 
         print("Enter size of alphabet :")
-        tmp = input("|E| = ")
+        tmp = raw_input("|E| = ")
         try:
             e_size = int(tmp)
             assert e_size>0
@@ -53,7 +61,7 @@ def dfa_input():
     #Input
     while(True):
         print("Enter size of the set of states :")
-        tmp = input("|Q| = ")
+        tmp = raw_input("|Q| = ")
         try:
             q_size = int(tmp)
             assert q_size >0
@@ -66,13 +74,13 @@ def dfa_input():
     states = set(range(q_size))
 
     #Printing some info
-    print(("States : ",states))
-    print(("Alphabet : ", alphabet))
+    print("States : ",states)
+    print("Alphabet : ", alphabet)
 
     #Final states in input
     while(True):
         print("Enter final states (ex. \"0,3,5\") :")
-        tmp = input("F = ")
+        tmp = raw_input("F = ")
         try:
             finals = [int(i) for i in tmp.replace(" ", '').split(',')]
             assert all([i in states for i in finals])
@@ -91,7 +99,7 @@ def dfa_input():
 
             while(True):
                 try :
-                    tmp = input(str(s)+" -"+str(a)+"-> ")
+                    tmp = raw_input(str(s)+" -"+str(a)+"-> ")
                     if tmp == '':
                         transition_table[s][a] = None
                         break
@@ -113,14 +121,18 @@ def dfa_input():
     return n
 
 def nfa_input():
+    """
+    Interactive prompt for initializing a NFA.
+    :return: a NFA
+    """
 
     print("Welcome to the NFA prompt")
     while(True):
         print("Enter a label for your NFA :")
-        label = input()
+        label = raw_input()
     
         print("Enter size of alphabet :")
-        tmp = input("|E| = ")
+        tmp = raw_input("|E| = ")
         try:
             e_size = int(tmp)
             assert e_size>0
@@ -148,7 +160,7 @@ def nfa_input():
     #Input
     while(True):
         print("Enter size of the set of states :")
-        tmp = input("|Q| = ")
+        tmp = raw_input("|Q| = ")
         try:
             q_size = int(tmp)
             assert q_size >0
@@ -161,13 +173,13 @@ def nfa_input():
     states = set(range(q_size))
 
     #Printing some info
-    print(("States : ",states))
-    print(("Alphabet : ", alphabet))
+    print("States : ",states)
+    print("Alphabet : ", alphabet)
 
     #Final states in input
     while(True):
         print("Enter final states (ex. \"0,3,5\") :")
-        tmp = input("F = ")
+        tmp = raw_input("F = ")
         try:
             finals = [int(i) for i in tmp.replace(" ", '').split(',')]
             assert all([i in states for i in finals])
@@ -187,7 +199,7 @@ def nfa_input():
 
             while(True):
                 try :
-                    tmp = input(str(s)+" -"+str(a)+"-> ")
+                    tmp = raw_input(str(s)+" -"+str(a)+"-> ")
                     if tmp == '':
                         transition_table[s][a] = None
                         break
@@ -210,7 +222,6 @@ def nfa_input():
     return n
 
 if __name__ == '__main__':
-
     print("This script needs to be run with the -i command.")
 
     while(True):
@@ -221,7 +232,7 @@ if __name__ == '__main__':
         print("2.create NFA")
         print("x. Go to python prompt and access created automata")
 
-        tmp = input()
+        tmp = raw_input()
         if(tmp == '1'):
             dfa = dfa_input()
             saved[dfa.label] = dfa

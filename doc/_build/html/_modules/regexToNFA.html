@@ -1,0 +1,397 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>regexToNFA &mdash; python_automata 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="python_automata 2.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">python_automata 2.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for regexToNFA</h1><div class="highlight"><pre>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;ntak&#39;</span>
+<span class="kn">import</span> <span class="nn">NFA</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This regex accepts any word w composed of a and b that has |a|%2=0 |b|%4=0</span>
+<span class="sd">&gt;&gt;&gt; nfa = regexToNFA(&#39;((b*ab*ab*)*|(a*ba*ba*ba*ba*)*)&#39;)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="nf">_tree_from_regex</span><span class="p">(</span><span class="n">regex</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes an regex in form of a string</span>
+
+<span class="sd">    Alphabet : single characters that aren&#39;t used as operators.</span>
+<span class="sd">    Supported operations : &#39;(x)&#39;, &#39;x*&#39;, &#39;x+&#39;, &#39;x|y&#39;, &#39;xy&#39;</span>
+
+<span class="sd">    :param regex: a string containing a regular expression (only with supported operations)</span>
+<span class="sd">    :return: a tree representing the regex from in a prefix manner.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">parentheses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="nb">open</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">regex</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s">&#39;(&#39;</span><span class="p">:</span>
+            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">counter</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">open</span> <span class="o">=</span> <span class="n">e</span>
+            <span class="k">elif</span> <span class="n">counter</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span>
+
+        <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s">&#39;)&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">counter</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">counter</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">parentheses</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">open</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+
+            <span class="k">elif</span> <span class="n">counter</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">counter</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span>
+
+    <span class="k">assert</span> <span class="n">counter</span> <span class="o">==</span> <span class="mi">0</span>
+
+
+    <span class="c">#There is a priority of operations to respect with regex</span>
+    <span class="c">#</span>
+    <span class="c"># 1. (x)</span>
+    <span class="c"># 2. x+, x*</span>
+    <span class="c"># 3. xy</span>
+    <span class="c"># 4. x|y</span>
+
+    <span class="c"># 1. the (x) operation</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">last</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c"># the index of the last ) met iterating in parentheses.</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">parentheses</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">last</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">i</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">regex</span><span class="p">[</span><span class="n">last</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_tree_from_regex</span><span class="p">(</span><span class="n">regex</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">j</span><span class="p">]))</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">j</span>
+
+    <span class="k">if</span> <span class="n">last</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">regex</span><span class="p">[</span><span class="n">last</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:])</span>
+
+    <span class="c"># 2. the *, + operations</span>
+    <span class="n">operators</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;*&#39;</span><span class="p">,</span> <span class="s">&#39;+&#39;</span><span class="p">}</span>
+    <span class="n">r2</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">operators</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">e</span><span class="p">):</span>
+            <span class="n">new_e</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">operators</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">new_e</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                        <span class="n">x</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+                        <span class="k">assert</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">r2</span><span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                            <span class="n">r2</span><span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="n">r2</span><span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">x</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_e</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                        <span class="n">t</span> <span class="o">=</span> <span class="n">new_e</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">r2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_e</span><span class="p">[:</span><span class="n">x</span><span class="p">])</span>
+                        <span class="n">r2</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">char</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span>
+                        <span class="n">new_e</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_e</span> <span class="o">+=</span> <span class="n">char</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">new_e</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">r2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_e</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">r2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="c"># 3. Concatenation (and the or operation)</span>
+    <span class="n">r3</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">concat</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">or_stack</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">r2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s">&#39;|&#39;</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">concat</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">or_stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;concat&#39;</span><span class="p">,</span> <span class="n">concat</span><span class="p">))</span>
+                    <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">or_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">concat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">or_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span> <span class="c">#epsilon</span>
+                    <span class="n">concat</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">concat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">e</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">concat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="c">#just one more iteration.</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">concat</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">or_stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;concat&#39;</span><span class="p">,</span> <span class="n">concat</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">or_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">concat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">or_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span> <span class="c"># epsilon</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">or_stack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">r3</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;|&#39;</span><span class="p">,</span> <span class="n">or_stack</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c">#There is no or in the regex at this level</span>
+        <span class="n">r3</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">or_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">r3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">r3</span>
+
+
+
+<span class="n">state_counter</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">previous</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">alphabet</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="bp">None</span>
+<div class="viewcode-block" id="regexToNFA"><a class="viewcode-back" href="../regexToNFA.html#regexToNFA.regexToNFA">[docs]</a><span class="k">def</span> <span class="nf">regexToNFA</span><span class="p">(</span><span class="n">regex</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param regex: a regex that defines a language.</span>
+<span class="sd">    Supported operations : &#39;(&#39;+x+&#39;)&#39;, &#39;x*&#39;, &#39;x+&#39;, &#39;x|y&#39;, &#39;xy&#39;</span>
+<span class="sd">    Alphabet : single characters that aren&#39;t used as operators.</span>
+<span class="sd">        ex. (a(bbc|d)*) , 10(101|000)*01(0|1)+</span>
+
+<span class="sd">    :return: the non-deterministic automaton that describe that language.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">state_counter</span>
+    <span class="k">global</span> <span class="n">previous</span>
+    <span class="k">global</span> <span class="n">alphabet</span>
+    <span class="k">global</span> <span class="n">delta</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">_tree_from_regex</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span>
+<span class="c">#    print(x)</span>
+    <span class="n">state_counter</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">states</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">new_state</span><span class="p">():</span>
+        <span class="k">global</span> <span class="n">state_counter</span>
+        <span class="n">state_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="s">&quot;x_</span><span class="si">%i</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">state_counter</span>
+        <span class="n">states</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="n">i</span>
+
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">dictionnary</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">addvalue</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dictionnary</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">dictionnary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">addvalue</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dictionnary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">addvalue</span><span class="p">])</span>
+
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="s">&#39;epi&#39;</span>
+    <span class="n">alphabet</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">epsilon</span><span class="p">])</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">new_state</span><span class="p">()</span>
+    <span class="n">previous</span> <span class="o">=</span> <span class="n">start</span>
+
+
+    <span class="k">def</span> <span class="nf">parse_tree</span><span class="p">(</span><span class="n">expr</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">previous</span>
+        <span class="k">global</span> <span class="n">alphabet</span>
+        <span class="k">global</span> <span class="n">delta</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">new_state</span><span class="p">()</span>
+            <span class="n">add</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">previous</span><span class="p">],</span> <span class="n">expr</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+            <span class="n">alphabet</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+            <span class="n">previous</span> <span class="o">=</span> <span class="n">n</span>
+
+        <span class="k">elif</span> <span class="n">expr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;*&#39;</span><span class="p">:</span>
+
+            <span class="n">initial</span> <span class="o">=</span> <span class="n">previous</span>
+            <span class="n">previous</span> <span class="o">=</span> <span class="n">new_state</span><span class="p">()</span>
+            <span class="n">add</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">initial</span><span class="p">],</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">previous</span><span class="p">)</span>
+            <span class="n">parse_tree</span><span class="p">(</span><span class="n">expr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">add</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">previous</span><span class="p">],</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">initial</span><span class="p">)</span>
+            <span class="n">previous</span> <span class="o">=</span> <span class="n">new_state</span><span class="p">()</span>
+            <span class="n">add</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">initial</span><span class="p">],</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">previous</span><span class="p">)</span>
+
+<span class="c">#            add(delta[previous], epsilon, i)</span>
+<span class="c">#            previous = i</span>
+<span class="c">#            parse_tree(expr[1])</span>
+<span class="c">#            final = previous</span>
+<span class="c">#            add(delta[final], epsilon, i)</span>
+<span class="c">#            add(delta[i], epsilon, final)</span>
+
+
+        <span class="k">elif</span> <span class="n">expr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;+&#39;</span><span class="p">:</span>
+            <span class="n">initial</span> <span class="o">=</span> <span class="n">previous</span>
+            <span class="n">parse_tree</span><span class="p">(</span><span class="n">expr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">final</span> <span class="o">=</span> <span class="n">previous</span>
+            <span class="n">add</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">final</span><span class="p">],</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">initial</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">expr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;|&#39;</span><span class="p">:</span>
+            <span class="n">initial</span> <span class="o">=</span> <span class="n">previous</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">expr</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">previous</span> <span class="o">=</span> <span class="n">new_state</span><span class="p">()</span>
+                <span class="n">add</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">initial</span><span class="p">],</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">previous</span><span class="p">)</span>
+<span class="c">#                previous = initial</span>
+                <span class="n">parse_tree</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="n">end</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
+
+            <span class="n">final</span> <span class="o">=</span> <span class="n">new_state</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">end</span><span class="p">:</span>
+                <span class="n">add</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">final</span><span class="p">)</span>
+            <span class="n">previous</span> <span class="o">=</span> <span class="n">final</span>
+
+        <span class="k">elif</span> <span class="n">expr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;concat&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">expr</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">parse_tree</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="n">parse_tree</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">delta</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">delta</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">i</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">k</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">)})</span>
+
+<span class="c">#    print(states, alphabet, delta, start, previous, epsilon)</span>
+    <span class="k">return</span> <span class="n">NFA</span><span class="o">.</span><span class="n">NFA</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="n">delta</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">c</span><span class="p">],</span> <span class="n">start</span><span class="p">,</span> <span class="p">[</span><span class="n">previous</span><span class="p">],</span> <span class="n">epsilon</span><span class="p">)</span>
+</div>
+<span class="k">def</span> <span class="nf">test1</span><span class="p">():</span>
+    <span class="n">automaton</span> <span class="o">=</span> <span class="n">regexToNFA</span><span class="p">(</span><span class="s">&#39;((aa)*|(bbb)*)+&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;aa&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;bbb&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;bbbbbb&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;aabbbaa&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;ab&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;aabbbbaa&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="c">#    print(automaton.accepted_under_length(10))</span>
+    <span class="k">return</span> <span class="n">automaton</span>
+
+
+<span class="k">def</span> <span class="nf">test2</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">regexToNFA</span><span class="p">(</span><span class="s">&#39;a*(a|bb)+&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;aa&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;bb&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;aabbabbabba&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;bbbbbbaa&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;ab&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;baaaa&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+ <span class="c">#   print(automaton.accepted_under_length(10))</span>
+    <span class="k">return</span> <span class="n">automaton</span>
+
+
+<span class="k">def</span> <span class="nf">test3</span><span class="p">():</span>
+    <span class="n">automaton</span> <span class="o">=</span> <span class="n">regexToNFA</span><span class="p">(</span><span class="s">&#39;(c(a|b(ab|cd)*))*&#39;</span><span class="p">)</span>
+    <span class="n">automaton</span><span class="o">.</span><span class="n">pretty_print</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;ca&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;cbabcdabab&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;cb&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;cba&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;cbcacbcb&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;cbcabacdb&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+<span class="c">#   print(automaton.accepted_under_length(10))</span>
+    <span class="k">return</span> <span class="n">automaton</span>
+
+
+<span class="k">def</span> <span class="nf">test4</span><span class="p">():</span>
+    <span class="n">automaton</span> <span class="o">=</span> <span class="n">regexToNFA</span><span class="p">(</span><span class="s">&#39;(c|b)(abc)*(a|a(ab|cd)*e+|ec*e)&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;ca&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;cabcaabca&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;cabcaabcde&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;babcaabcdcdabeeeeeeeeeeeeeee&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;baabcde&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;aabcd&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;ab&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;baaaa&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;cecec&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;bbcae&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;becccccce&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;bee&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
+    <span class="c">#    print(automaton.accepted_under_length(10))</span>
+    <span class="k">return</span> <span class="n">automaton</span>
+
+<span class="c">#test3()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">python_automata 2.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Vincent Antaki &amp; andrewbadr.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
