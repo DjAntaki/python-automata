@@ -48,7 +48,7 @@ def test1():
 
     return test_nfa
 
-def test2():
+def test2(verbose = False):
     #Example tiré des notes de cours de Pierre Mckenzie pour le cours IFT2105
 
     #NFA that accepts words with |w|_a = 0 mod 2 or |w|_b = 0 mod 4
@@ -124,12 +124,10 @@ def test2():
     dfa_from_reg.minimize()
     #Time to test!
     to_test = [nfa,dfa,dfa2, nfa_from_reg, dfa_from_reg]
-    to_test = [nfa,dfa,dfa2, nfa_from_reg, dfa_from_reg]
-    verbose = False
+    to_test = [nfa,dfa,dfa2, nfa_from_reg, dfa_from_reg, regexToNFA.regexToNFA('(b*(ab*ab*)*|a*(ba*ba*ba*ba*)*)')]
 
     results = [x.recognizes('') for x in to_test]
     assert all(results) is True
-    verbose = True
     for x in range(1,10):
         for i in product(alphabet, repeat=x):
             entree = ''.join(i)

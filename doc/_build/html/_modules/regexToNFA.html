@@ -52,7 +52,7 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This regex accepts any word w composed of a and b that has |a|%2=0 |b|%4=0</span>
-<span class="sd">&gt;&gt;&gt; nfa = regexToNFA(&#39;((b*ab*ab*)*|(a*ba*ba*ba*ba*)*)&#39;)</span>
+<span class="sd">&gt;&gt;&gt; nfa = regexToNFA(&#39;(b*(ab*ab*)*|a*(ba*ba*ba*ba*)*)&#39;)</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -301,7 +301,7 @@
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;ab&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;aabbbbaa&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
-    <span class="c">#    print(automaton.accepted_under_length(10))</span>
+    <span class="c">#    print(automaton.accepted_under(10))</span>
     <span class="k">return</span> <span class="n">automaton</span>
 
 
@@ -315,7 +315,7 @@
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;ab&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;baaaa&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
- <span class="c">#   print(automaton.accepted_under_length(10))</span>
+ <span class="c">#   print(automaton.accepted_under(10))</span>
     <span class="k">return</span> <span class="n">automaton</span>
 
 
@@ -329,7 +329,7 @@
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;cba&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;cbcacbcb&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;cbcabacdb&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
-<span class="c">#   print(automaton.accepted_under_length(10))</span>
+<span class="c">#   print(automaton.accepted_under(10))</span>
     <span class="k">return</span> <span class="n">automaton</span>
 
 
@@ -348,7 +348,7 @@
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;bbcae&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;becccccce&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
     <span class="k">assert</span> <span class="n">automaton</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;bee&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
-    <span class="c">#    print(automaton.accepted_under_length(10))</span>
+    <span class="c">#    print(automaton.accepted_under(10))</span>
     <span class="k">return</span> <span class="n">automaton</span>
 
 <span class="c">#test3()</span>

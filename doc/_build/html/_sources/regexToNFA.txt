@@ -1,7 +1,17 @@
 Regex to NFA
 =====
 
-exemple:
+Here is an example of typical usage of module regexToNFA.
+We will use it to create a NFA that accepts any word maded
+
+ | python_automata$ python3 -i src/regexToNFA.py
+ | >>> nfa1 = regexToNFA('(b*ab*ab*)*|(a*ba*ba*ba*ba*)')
+ | >>> nfa1.accepted_under_length(6)
+ | ['','aa', 'baa', 'aba', 'aab', 'bbbb', 'bbaa', 'baba', 'baab', 'abba', 'abab', 'aabb', 'aaaa', 'bbbba', 'bbbab', 'bbbaa',
+ | 'bbabb', 'bbaba', 'bbaab', 'babbb', 'babba', 'babab', 'baabb', 'baaaa', 'abbbb', 'abbba', 'abbab', 'ababb', 'abaaa',
+ | 'aabbb', 'aabaa', 'aaaba', 'aaaab']
+ | >>>
+
 
 
 .. automodule:: regexToNFA

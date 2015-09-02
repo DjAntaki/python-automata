@@ -23,7 +23,7 @@ def save_prompt(FA):
 def dfa_input():
     """
     Interactive prompt for initializing a DFA
-    :return: a DFA
+    :return: the DFA created
     """
     print("Welcome to the DFA prompt")
     while(True):
@@ -121,7 +121,7 @@ def dfa_input():
 def nfa_input():
     """
     Interactive prompt for initializing a NFA.
-    :return: a NFA
+    :return: the created NFA
     """
 
     print("Welcome to the NFA prompt")

@@ -54,7 +54,19 @@
             
   <div class="section" id="regex-to-nfa">
 <h1>Regex to NFA<a class="headerlink" href="#regex-to-nfa" title="Permalink to this headline">¶</a></h1>
-<p>exemple:</p>
+<p>Here is an example of typical usage of module regexToNFA.
+We will use it to create a NFA that accepts any word maded</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">python_automata$ python3 -i src/regexToNFA.py</div>
+<div class="line">&gt;&gt;&gt; nfa1 = regexToNFA(&#8216;(b*ab*ab*)*|(a*ba*ba*ba*ba*)&#8217;)</div>
+<div class="line">&gt;&gt;&gt; nfa1.accepted_under_length(6)</div>
+<div class="line">[&#8216;&#8217;,&#8217;aa&#8217;, &#8216;baa&#8217;, &#8216;aba&#8217;, &#8216;aab&#8217;, &#8216;bbbb&#8217;, &#8216;bbaa&#8217;, &#8216;baba&#8217;, &#8216;baab&#8217;, &#8216;abba&#8217;, &#8216;abab&#8217;, &#8216;aabb&#8217;, &#8216;aaaa&#8217;, &#8216;bbbba&#8217;, &#8216;bbbab&#8217;, &#8216;bbbaa&#8217;,</div>
+<div class="line">&#8216;bbabb&#8217;, &#8216;bbaba&#8217;, &#8216;bbaab&#8217;, &#8216;babbb&#8217;, &#8216;babba&#8217;, &#8216;babab&#8217;, &#8216;baabb&#8217;, &#8216;baaaa&#8217;, &#8216;abbbb&#8217;, &#8216;abbba&#8217;, &#8216;abbab&#8217;, &#8216;ababb&#8217;, &#8216;abaaa&#8217;,</div>
+<div class="line">&#8216;aabbb&#8217;, &#8216;aabaa&#8217;, &#8216;aaaba&#8217;, &#8216;aaaab&#8217;]</div>
+<div class="line">&gt;&gt;&gt;</div>
+</div>
+</div></blockquote>
 <span class="target" id="module-regexToNFA"></span><dl class="function">
 <dt id="regexToNFA.regexToNFA">
 <tt class="descclassname">regexToNFA.</tt><tt class="descname">regexToNFA</tt><big>(</big><em>regex</em><big>)</big><a class="reference internal" href="_modules/regexToNFA.html#regexToNFA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#regexToNFA.regexToNFA" title="Permalink to this definition">¶</a></dt>

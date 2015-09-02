@@ -24,8 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="python_automata 2.0 documentation" href="index.html" />
-    <link rel="next" title="Credits" href="credits.html" />
-    <link rel="prev" title="Welcome to python-automata’s documentation!" href="index.html" /> 
+    <link rel="next" title="NFA" href="NFA.html" />
+    <link rel="prev" title="FiniteStateMachine" href="FiniteStateMachine.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="credits.html" title="Credits"
+          <a href="NFA.html" title="NFA"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to python-automata’s documentation!"
+          <a href="FiniteStateMachine.html" title="FiniteStateMachine"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">python_automata 2.0 documentation</a> &raquo;</li> 
       </ul>
@@ -54,7 +54,39 @@
             
   <div class="section" id="dfa">
 <h1>DFA<a class="headerlink" href="#dfa" title="Permalink to this headline">¶</a></h1>
-<p>Paragraphe au debut</p>
+<p>Here is an example of an initialisation of a DFA that accepts
+the language a*ba(ba*ba)*a</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">&gt;&gt;&gt; states = [0,1,2,3]</div>
+<div class="line">&gt;&gt;&gt; alphabet = [&#8216;a&#8217;,&#8217;b&#8217;]</div>
+<div class="line">&gt;&gt;&gt; accepts = {3}</div>
+<div class="line">&gt;&gt;&gt; start = 0</div>
+<div class="line">&gt;&gt;&gt; transition_table = {0:{&#8216;a&#8217;:None,&#8217;b&#8217;:1}, 1:{&#8216;a&#8217;:2,&#8217;b&#8217;:None},</div>
+<div class="line-block">
+<div class="line">2:{&#8216;a&#8217;:3,&#8217;b&#8217;:0},3:{&#8216;a&#8217;:None,&#8217;b&#8217;:None, &#8216;c&#8217;:None}}</div>
+</div>
+<div class="line">&gt;&gt;&gt; delta = lambda s,a : transition_table[s][a]</div>
+<div class="line">&gt;&gt;&gt; dfa = DFA(states, alphabet, delta, start, accepts)</div>
+<div class="line">&gt;&gt;&gt; dfa.pretty_print2()</div>
+<div class="line"><br /></div>
+</div>
+<p><a href="#id1"><span class="problematic" id="id2">|</span></a>This FSM has 4 states
+<a href="#id3"><span class="problematic" id="id4">|</span></a>Type : &lt;type &#8216;instance&#8217;&gt;
+<a href="#id5"><span class="problematic" id="id6">|</span></a>(&#8216;States:&#8217;, set([0, 1, 2, 3]))
+<a href="#id7"><span class="problematic" id="id8">|</span></a>(&#8216;Alphabet:&#8217;, set([&#8216;a&#8217;, &#8216;b&#8217;]))
+<a href="#id9"><span class="problematic" id="id10">|</span></a>(&#8216;Starting state:&#8217;, &#8216;0&#8217;)
+<a href="#id11"><span class="problematic" id="id12">|</span></a>(&#8216;Accepting states:&#8217;, set([3]))
+<a href="#id13"><span class="problematic" id="id14">|</span></a>Transition table:
+<a href="#id15"><span class="problematic" id="id16">|</span></a>{0:{a:{None}, b:{1}},
+<a href="#id17"><span class="problematic" id="id18">|</span></a>1:{a:{2}, b:{None}},
+<a href="#id19"><span class="problematic" id="id20">|</span></a>2:{a:{3}, b:{0}},
+<a href="#id21"><span class="problematic" id="id22">|</span></a>3:{a:{None}, b:{None}}}
+<a href="#id23"><span class="problematic" id="id24">|</span></a>(&#8216;Current state:&#8217;, &#8216;0&#8217;)
+<a href="#id25"><span class="problematic" id="id26">|</span></a>(&#8216;Currently accepting:&#8217;, False)
+|
+| &gt;&gt;&gt;</p>
+</div></blockquote>
 <span class="target" id="module-DFA"></span><dl class="class">
 <dt id="DFA.DFA">
 <em class="property">class </em><tt class="descclassname">DFA.</tt><tt class="descname">DFA</tt><big>(</big><em>states</em>, <em>alphabet</em>, <em>delta</em>, <em>start</em>, <em>accepts</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA" title="Permalink to this definition">¶</a></dt>
@@ -62,17 +94,56 @@
 <dl class="method">
 <dt id="DFA.DFA.DFCA_minimize">
 <tt class="descname">DFCA_minimize</tt><big>(</big><em>l=None</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.DFCA_minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.DFCA_minimize" title="Permalink to this definition">¶</a></dt>
-<dd><p>DFCA minimization&#8221;
-Input: &#8220;self&#8221; is a DFA accepting a finite language
-Result: &#8220;self&#8221; is DFCA-minimized, and the returned value is the length of the longest</p>
-<blockquote>
-<div>word accepted by the original DFA</div></blockquote>
+<dd><p>DFCA minimization</p>
+<p>Input: &#8220;self&#8221; is a DFA accepting a finite language</p>
+<p>Result: &#8220;self&#8221; is DFCA-minimized, and the returned value is the length of the longest word accepted by the original DFA</p>
 <p>See &#8220;Minimal cover-automata for finite languages&#8221; for context on DFCAs, and
 &#8220;An O(n^2) Algorithm for Constructing Minimal Cover Automata for Finite Languages&#8221;
 for the source of this algorithm (Campeanu, Paun, Santean, and Yu). We follow their
 algorithm exactly, except that &#8220;l&#8221; is optionally calculated for you, and the state-
 ordering is automatically created.</p>
 <p>There exists a faster, O(n*logn)-time algorithm due to Korner, from CIAA 2002.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>states</em>, <em>alphabet</em>, <em>delta</em>, <em>start</em>, <em>accepts</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>The inputs to the class constructor are as follows :</p>
+<blockquote>
+<div><ul class="simple">
+<li>states: An iterable containing the states of the DFA. States must be immutable.</li>
+<li>alphabet: An iterable containing the symbols in the DFA&#8217;s alphabet. Symbols must be immutable.</li>
+<li>delta: A complete function from [states]x[alphabets]-&gt;[states].</li>
+<li>start: The state at which the DFA begins operation.</li>
+<li>accepts: A list containing the &#8220;accepting&#8221; or &#8220;final&#8221; states of the DFA.</li>
+</ul>
+</div></blockquote>
+<p>Making delta a function rather than a transition table makes it much easier to define certain DFAs.
+If you want to use a transition table, you can just do this:</p>
+<blockquote>
+<div>delta = lambda q,c: transition_table[q][c]</div></blockquote>
+<p>One caveat is that the function should not depend on the value of &#8216;states&#8217; or &#8216;accepts&#8217;, since
+these may be modified during minimization.</p>
+<p>Finally, the names of states and inputs should be hashable. This generally means strings, numbers,
+or tuples of hashables.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DFA.DFA.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'DFA'</em><a class="headerlink" href="#DFA.DFA.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.accepted_under">
+<tt class="descname">accepted_under</tt><big>(</big><em>max_length</em><big>)</big><a class="headerlink" href="#DFA.DFA.accepted_under" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try all words of length &lt; than input and return the list of those accepted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.accepted_under_word">
+<tt class="descname">accepted_under_word</tt><big>(</big><em>max_word</em><big>)</big><a class="headerlink" href="#DFA.DFA.accepted_under_word" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enumerate all the accepted word. Which does not makes much sense
+to me when the alphabet is a unordered set of element.</p>
 </dd></dl>
 
 <dl class="method">
@@ -100,6 +171,28 @@ Returns the hash mapping each old state to its new representative.</p>
 <tt class="descname">f_equivalence_classes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.f_equivalence_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.f_equivalence_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a partition of the states into finite-difference equivalence clases, using
 the experimental O(n^2) algorithm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.getAlphabet">
+<tt class="descname">getAlphabet</tt><big>(</big><big>)</big><a class="headerlink" href="#DFA.DFA.getAlphabet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a set containing the alphabet.
+If the FSM is non-deterministic, this function does not return the epsilon symbol.
+if you actually want the alphabet with the epsilon, use self.alphabet</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.get_transition_table">
+<tt class="descname">get_transition_table</tt><big>(</big><big>)</big><a class="headerlink" href="#DFA.DFA.get_transition_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the transition table from the function self.delta defined on [states] X [alphabet] -&gt; ([states])*
+Returns a dictionnary of states where each element is a dictionnary with (key,value) = [alphabet],[states]</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">&gt;&gt;&gt; x = NFA(state=set() )</div>
+<div class="line">&gt;&gt;&gt; t = x.get_transition_table()</div>
+<div class="line">&gt;&gt;&gt; t[0][&#8216;a&#8217;]</div>
+</div>
+</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -168,6 +261,19 @@ are finitely many strings that reach it from the start state.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="DFA.DFA.pretty_print">
+<tt class="descname">pretty_print</tt><big>(</big><big>)</big><a class="headerlink" href="#DFA.DFA.pretty_print" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays all information about the NFA in an easy-to-read way. Not
+actually that easy to read if it has too many states.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.pretty_print2">
+<tt class="descname">pretty_print2</tt><big>(</big><big>)</big><a class="headerlink" href="#DFA.DFA.pretty_print2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="DFA.DFA.reachable">
 <tt class="descname">reachable</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.reachable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.reachable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the reachable subset of the DFA&#8217;s states.</p>
@@ -184,6 +290,16 @@ parameter &#8220;inclusive&#8221; indicates that q0 should always be included.</
 <dt id="DFA.DFA.recognizes">
 <tt class="descname">recognizes</tt><big>(</big><em>char_sequence</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.recognizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.recognizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates whether the DFA accepts a given string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="DFA.DFA.remap">
+<tt class="descname">remap</tt><big>(</big><em>q0</em>, <em>a</em>, <em>q</em><big>)</big><a class="headerlink" href="#DFA.DFA.remap" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function changes the output of one transition
+q0 : the initial state
+a : a symbol of the alphabet
+q : the final states. Can be an object or a set of objects</p>
+<p>q0 -a-&gt; set([q])</p>
 </dd></dl>
 
 <dl class="method">
@@ -242,10 +358,10 @@ If q1 was the start or current state, those are also moved to q2.</p>
 <dt id="DFA.DFA.validate">
 <tt class="descname">validate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks that:
-(1) The accepting-state set is a subset of the state set.
-(2) The start-state is a member of the state set.
-(3) The current-state is a member of the state set.
-(4) Every transition returns a member of the state set.</p>
+1. The accepting-state set is a subset of the state set.
+2. The start-state is a member of the state set.
+3. The current-state is a member of the state set.
+4. Every transition returns a member of the state set.</p>
 </dd></dl>
 
 </dd></dl>
@@ -263,6 +379,11 @@ DFA accepts if f(A[q1],A[q2]), where A indicates the acceptance-value of the sta
 <tt class="descclassname">DFA.</tt><tt class="descname">equals</tt><big>(</big><em>D1</em>, <em>D2</em><big>)</big><a class="reference internal" href="_modules/DFA.html#equals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.equals" title="Permalink to this definition">¶</a></dt>
 <dd><p>T</p>
 </dd></dl>
+
+<dl class="function">
+<dt id="DFA.finite_factor">
+<tt class="descclassname">DFA.</tt><tt class="descname">finite_factor</tt><big>(</big><em>self</em><big>)</big><a class="reference internal" href="_modules/DFA.html#finite_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.finite_factor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="DFA.from_word_list">
@@ -320,11 +441,11 @@ the states should be accepting.</p>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to python-automata&#8217;s documentation!</a></p>
+  <p class="topless"><a href="FiniteStateMachine.html"
+                        title="previous chapter">FiniteStateMachine</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="credits.html"
-                        title="next chapter">Credits</a></p>
+  <p class="topless"><a href="NFA.html"
+                        title="next chapter">NFA</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/DFA.txt"
@@ -357,10 +478,10 @@ the states should be accepting.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="credits.html" title="Credits"
+          <a href="NFA.html" title="NFA"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to python-automata’s documentation!"
+          <a href="FiniteStateMachine.html" title="FiniteStateMachine"
              >previous</a> |</li>
         <li><a href="index.html">python_automata 2.0 documentation</a> &raquo;</li> 
       </ul>

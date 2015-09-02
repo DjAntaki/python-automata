@@ -7,19 +7,15 @@
 
 from copy import copy
 import collections
-
 import UnionFind
 from FiniteStateMachine import FiniteStateMachine
 
-
-# TODO: general code cleanup
-# TODO: write tests
-
-
 class DFA(FiniteStateMachine):
     """This class represents a deterministic finite automaton."""
+
     def __init__(self, states, alphabet, delta, start, accepts):
-        """The inputs to the class are as follows:
+        """The inputs to the class constructor are as follows :
+
          - states: An iterable containing the states of the DFA. States must be immutable.
          - alphabet: An iterable containing the symbols in the DFA's alphabet. Symbols must be immutable.
          - delta: A complete function from [states]x[alphabets]->[states].
@@ -44,10 +40,10 @@ class DFA(FiniteStateMachine):
 
     def validate(self):
         """Checks that:
-        (1) The accepting-state set is a subset of the state set.
-        (2) The start-state is a member of the state set.
-        (3) The current-state is a member of the state set.
-        (4) Every transition returns a member of the state set.
+         1. The accepting-state set is a subset of the state set.
+         2. The start-state is a member of the state set.
+         3. The current-state is a member of the state set.
+         4. Every transition returns a member of the state set.
         """
         assert set(self.accepts).issubset(set(self.states))
         assert self.start in self.states
@@ -71,11 +67,21 @@ class DFA(FiniteStateMachine):
         """Updates the DFA's current state based on a single character of input."""
         self.current_state = self.delta(self.current_state, char)
 
-    def step_sequence(self, char_sequence):
+    def step_sequence(self, char_sequence, verbose = False):
         """Updates the DFA's current state based on an iterable of inputs."""
+        if verbose:
+            print('Starting state : '+str(self.states))
         for char in char_sequence:
-            self.step(char)
+            if char not in self.alphabet:
+                if verbose:
+                    print('Character '+str(char)+' not in alphabet')
+                self.current_state = set()
+                return
 
+            self.step(char)
+            if (verbose):
+                print('input : '+ char)
+                print('state(s) : '+str(self.states))
     def status(self):
         """Indicates whether the DFA's current state is accepting."""
         return (self.current_state in self.accepts)
@@ -433,10 +439,10 @@ class DFA(FiniteStateMachine):
         return long_path(self.start, 0, None)
 
     def DFCA_minimize(self, l=None):
-        """DFCA minimization"
-        Input: "self" is a DFA accepting a finite language
-        Result: "self" is DFCA-minimized, and the returned value is the length of the longest
-                word accepted by the original DFA
+        """DFCA minimization
+
+        Input: "self" is a DFA accepting a finite language \n
+        Result: "self" is DFCA-minimized, and the returned value is the length of the longest word accepted by the original DFA
 
         See "Minimal cover-automata for finite languages" for context on DFCAs, and
         "An O(n^2) Algorithm for Constructing Minimal Cover Automata for Finite Languages"

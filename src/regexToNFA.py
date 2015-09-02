@@ -185,7 +185,11 @@ def regexToNFA(regex):
         global alphabet
         global delta
 
-        if len(expr) == 1 :
+        if expr is None:
+            #Epsilon
+            return
+
+        elif len(expr) == 1 :
             n = new_state()
             add(delta[previous], expr, n)
             alphabet.add(expr)
@@ -241,65 +245,3 @@ def regexToNFA(regex):
 
 #    print(states, alphabet, delta, start, previous, epsilon)
     return NFA.NFA(states, alphabet, lambda x, c: delta[x][c], start, [previous], epsilon)
-
-def test1():
-    automaton = regexToNFA('((aa)*|(bbb)*)+')
-    assert automaton.recognizes('aa') is True
-    assert automaton.recognizes('') is True
-    assert automaton.recognizes('bbb') is True
-    assert automaton.recognizes('bbbbbb') is True
-    assert automaton.recognizes('aabbbaa') is True
-    assert automaton.recognizes('ab') is False
-    assert automaton.recognizes('aabbbbaa') is False
-    assert automaton.recognizes('a') is False
-    #    print(automaton.accepted_under_length(10))
-    return automaton
-
-
-def test2():
-    return regexToNFA('a*(a|bb)+')
-    assert automaton.recognizes('a') is True
-    assert automaton.recognizes('aa') is True
-    assert automaton.recognizes('bb') is True
-    assert automaton.recognizes('aabbabbabba') is True
-    assert automaton.recognizes('bbbbbbaa') is True
-    assert automaton.recognizes('ab') is False
-    assert automaton.recognizes('baaaa') is False
-    assert automaton.recognizes('') is False
- #   print(automaton.accepted_under_length(10))
-    return automaton
-
-
-def test3():
-    automaton = regexToNFA('(c(a|b(ab|cd)*))*')
-    automaton.pretty_print()
-    assert automaton.recognizes('ca') is True
-    assert automaton.recognizes('cbabcdabab') is True
-    assert automaton.recognizes('cb') is True
-    assert automaton.recognizes('') is True
-    assert automaton.recognizes('cba') is False
-    assert automaton.recognizes('cbcacbcb') is True
-    assert automaton.recognizes('cbcabacdb') is False
-#   print(automaton.accepted_under_length(10))
-    return automaton
-
-
-def test4():
-    automaton = regexToNFA('(c|b)(abc)*(a|a(ab|cd)*e+|ec*e)')
-    assert automaton.recognizes('ca') is True
-    assert automaton.recognizes('cabcaabca') is False
-    assert automaton.recognizes('cabcaabcde') is True
-    assert automaton.recognizes('babcaabcdcdabeeeeeeeeeeeeeee') is True
-    assert automaton.recognizes('baabcde') is True
-    assert automaton.recognizes('aabcd') is False
-    assert automaton.recognizes('ab') is False
-    assert automaton.recognizes('baaaa') is False
-    assert automaton.recognizes('cecec') is False
-    assert automaton.recognizes('') is False
-    assert automaton.recognizes('bbcae') is False
-    assert automaton.recognizes('becccccce') is True
-    assert automaton.recognizes('bee') is True
-    #    print(automaton.accepted_under_length(10))
-    return automaton
-
-#test3()

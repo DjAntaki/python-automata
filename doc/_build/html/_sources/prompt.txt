@@ -1,7 +1,19 @@
 Prompt Interface
 =============
 
-The file prompt.py is if python >=3. The file prompt2.py is for python 2.7
+To use the interactive prompt interface, use one of the two following command :
+
+.../python_automata$ python -i src/prompt2.py
+.../python_automata$ python3 -i src/prompt.py
+
+
+You will be then asked
+
+
+
+Once you finish creating automata you can choose the option x the leave the prompt loop and access the python interactive prompt. Your created automata will be in the dictionnary 'saved'
+
+
 
 .. automodule:: prompt
    :members:

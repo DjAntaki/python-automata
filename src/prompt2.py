@@ -5,11 +5,64 @@ from DFA import DFA
 import FiniteStateMachine
 from NFA import NFA
 
-saved = {}
+"""
+This modules contains some functions to interactively create NFA and DFA.
+If run this file using the command "python3 -i prompt.py" (or "python -i prompt2.py" if you uses an earlier version of python),
+you can create your NFAs and DFAs, quit the main loop and then use the python interpreter to play with your automata.
+
+The created automata are stored in the dictonnary variable 'automata' and can be accessed
+in the python interpreter using the precedently given label.
+
+
+Here is an example of typical use :
+
+| .../python_automata/src$ python3 -i prompt.py
+Welcome to the make-your-own-automata prompt interface!
+This script needs to be run with the -i command.
+Choose between :
+1.create DFA
+2.create NFA
+x. Go to python prompt and access created automata
+1
+Welcome to the DFA prompt
+Enter a label for your DFA :
+dfa1
+Enter size of alphabet :
+|E| = 2
+Enter size of the set of states :
+|Q| = 2
+('States : ', set([0, 1]))
+('Alphabet : ', set(['a', 'b']))
+Enter final states (ex. "0,3,5") :
+F = 1
+You will now enter the following states for each transitions. (ex. "0,3,5")
+If you do not wish for a transition to exist, press enter
+0 -a-> 0
+0 -b-> 1
+1 -a->
+1 -b-> 1
+You have sucessfully created a DFA.
+If you want to save this finite state machine, please enter a path.
+If you do not want to save, press enter. automatas/dfa1.aut
+
+
+
+| >>>
+| >>>
+|     ...
+| >>>
+| >>>
+
+
+
+
+"""
+
+automata = {}
 
 def save_prompt(FA):
     """
-    Interactive prompt for saving a finite automaton.
+    Interactive prompt for saving a finite automaton. Creates a file at entered path.
     :param FA: A finite automaton
     """
     x = raw_input("If you want to save this finite state machine, please enter a path. \n"+
@@ -23,7 +76,7 @@ def save_prompt(FA):
 def dfa_input():
     """
     Interactive prompt for initializing a DFA
-    :return: a DFA
+    :return: the DFA created
     """
     print("Welcome to the DFA prompt")
     while(True):
@@ -121,7 +174,7 @@ def dfa_input():
 def nfa_input():
     """
     Interactive prompt for initializing a NFA.
-    :return: a NFA
+    :return: the created NFA
     """
 
     print("Welcome to the NFA prompt")
@@ -233,12 +286,12 @@ if __name__ == '__main__':
         tmp = raw_input()
         if(tmp == '1'):
             dfa = dfa_input()
-            saved[dfa.label] = dfa
+            automata[dfa.label] = dfa
             save_prompt(dfa)
         elif(tmp == '2'):
 
             nfa = nfa_input()
-            saved[nfa.label] = nfa
+            automata[nfa.label] = nfa
             save_prompt(nfa)
         elif(tmp == 'x'):
             break
@@ -246,4 +299,4 @@ if __name__ == '__main__':
             print("Unrecognized answer.")
             print(tmp)
 
-    print("See dictionnary \"saved\" for created state machines.")
+    print("See dictionnary \"automata\" for created state machines.")

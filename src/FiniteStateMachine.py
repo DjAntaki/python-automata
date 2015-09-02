@@ -6,6 +6,9 @@ from itertools import product
 # Some small utils
 
 class FiniteStateMachine:
+    """
+    An abstract class that is both inherited by DFA and NFA.
+    """
 
     def getAlphabet(self):
         """
@@ -20,29 +23,30 @@ class FiniteStateMachine:
         return self.alphabet
 
     def get_transition_table(self):
-        """
-        Build the transition table from the function self.delta defined on [states] X [alphabet] -> ([states])*
+        """Build the transition table from the function self.delta defined on [states] X [alphabet] -> ([states])*
         Returns a dictionnary of states where each element is a dictionnary with (key,value) = [alphabet],[states]
 
-        \>>> x = NFA(state=set() )
-        \>>> t = x.get_transition_table()
-        \>>> t[0]['a']
-            1
+         | >>> x = NFA(state=set() )
+         | >>> t = x.get_transition_table()
+         | >>> t[0]['a']
+
         """
         d = {}
         for x in sorted(self.states):
             d[x] = {}
             for c in self.alphabet:
                 d[x][c] = self.delta(x, c)
-                #        d[x].update(map(lambda c: (c,func(x, c)), alphabet.copy()))
+
         return d
 
-    def accepted_under_length(self, max_length):
+    def accepted_under(self, max_length):
         """
         Try all words of length < than input and return the list of those accepted.
-
         """
         accepted_words_list = []
+        if self.recognizes(''):
+            accepted_words_list.append('');
+
         for x in range(1, max_length):
             for i in product(self.getAlphabet(), repeat=x):
                 entree = ''.join(i)

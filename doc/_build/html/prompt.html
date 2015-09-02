@@ -54,7 +54,32 @@
             
   <div class="section" id="prompt-interface">
 <h1>Prompt Interface<a class="headerlink" href="#prompt-interface" title="Permalink to this headline">¶</a></h1>
-<p>The file prompt.py is if python &gt;=3. The file prompt2.py is for python 2.7</p>
+<p>To use the interactive prompt interface, use one of the two following command :</p>
+<p>.../python_automata$ python -i src/prompt2.py
+.../python_automata$ python3 -i src/prompt.py</p>
+<p>You will be then asked</p>
+<p>Once you finish creating automata you can choose the option x the leave the prompt loop and access the python interactive prompt. Your created automata will be in the dictionnary &#8216;saved&#8217;</p>
+<span class="target" id="module-prompt"></span><dl class="function">
+<dt id="prompt.dfa_input">
+<tt class="descclassname">prompt.</tt><tt class="descname">dfa_input</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/prompt.html#dfa_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#prompt.dfa_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interactive prompt for initializing a DFA
+:return: the DFA created</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="prompt.nfa_input">
+<tt class="descclassname">prompt.</tt><tt class="descname">nfa_input</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/prompt.html#nfa_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#prompt.nfa_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interactive prompt for initializing a NFA.
+:return: the created NFA</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="prompt.save_prompt">
+<tt class="descclassname">prompt.</tt><tt class="descname">save_prompt</tt><big>(</big><em>FA</em><big>)</big><a class="reference internal" href="_modules/prompt.html#save_prompt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#prompt.save_prompt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interactive prompt for saving a finite automaton.
+:param FA: A finite automaton</p>
+</dd></dl>
+
 </div>
 
 

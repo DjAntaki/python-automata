@@ -54,8 +54,77 @@
             
   <div class="section" id="finitestatemachine">
 <h1>FiniteStateMachine<a class="headerlink" href="#finitestatemachine" title="Permalink to this headline">¶</a></h1>
-<p>Paragraphe au debut</p>
-<span class="target" id="module-FiniteStateMachine"></span><dl class="function">
+<p>FiniteStateMachine</p>
+<span class="target" id="module-FiniteStateMachine"></span><dl class="class">
+<dt id="FiniteStateMachine.FiniteStateMachine">
+<em class="property">class </em><tt class="descclassname">FiniteStateMachine.</tt><tt class="descname">FiniteStateMachine</tt><a class="reference internal" href="_modules/FiniteStateMachine.html#FiniteStateMachine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FiniteStateMachine.FiniteStateMachine" title="Permalink to this definition">¶</a></dt>
+<dd><p>An abstract class that is both inherited by DFA and NFA.</p>
+<dl class="attribute">
+<dt id="FiniteStateMachine.FiniteStateMachine.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'FiniteStateMachine'</em><a class="headerlink" href="#FiniteStateMachine.FiniteStateMachine.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FiniteStateMachine.FiniteStateMachine.accepted_under">
+<tt class="descname">accepted_under</tt><big>(</big><em>max_length</em><big>)</big><a class="reference internal" href="_modules/FiniteStateMachine.html#FiniteStateMachine.accepted_under"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FiniteStateMachine.FiniteStateMachine.accepted_under" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try all words of length &lt; than input and return the list of those accepted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="FiniteStateMachine.FiniteStateMachine.accepted_under_word">
+<tt class="descname">accepted_under_word</tt><big>(</big><em>max_word</em><big>)</big><a class="reference internal" href="_modules/FiniteStateMachine.html#FiniteStateMachine.accepted_under_word"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FiniteStateMachine.FiniteStateMachine.accepted_under_word" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enumerate all the accepted word. Which does not makes much sense
+to me when the alphabet is a unordered set of element.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="FiniteStateMachine.FiniteStateMachine.getAlphabet">
+<tt class="descname">getAlphabet</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/FiniteStateMachine.html#FiniteStateMachine.getAlphabet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FiniteStateMachine.FiniteStateMachine.getAlphabet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a set containing the alphabet.
+If the FSM is non-deterministic, this function does not return the epsilon symbol.
+if you actually want the alphabet with the epsilon, use self.alphabet</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="FiniteStateMachine.FiniteStateMachine.get_transition_table">
+<tt class="descname">get_transition_table</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/FiniteStateMachine.html#FiniteStateMachine.get_transition_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FiniteStateMachine.FiniteStateMachine.get_transition_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the transition table from the function self.delta defined on [states] X [alphabet] -&gt; ([states])*
+Returns a dictionnary of states where each element is a dictionnary with (key,value) = [alphabet],[states]</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">&gt;&gt;&gt; x = NFA(state=set() )</div>
+<div class="line">&gt;&gt;&gt; t = x.get_transition_table()</div>
+<div class="line">&gt;&gt;&gt; t[0][&#8216;a&#8217;]</div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="FiniteStateMachine.FiniteStateMachine.pretty_print">
+<tt class="descname">pretty_print</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/FiniteStateMachine.html#FiniteStateMachine.pretty_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FiniteStateMachine.FiniteStateMachine.pretty_print" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays all information about the NFA in an easy-to-read way. Not
+actually that easy to read if it has too many states.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="FiniteStateMachine.FiniteStateMachine.pretty_print2">
+<tt class="descname">pretty_print2</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/FiniteStateMachine.html#FiniteStateMachine.pretty_print2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FiniteStateMachine.FiniteStateMachine.pretty_print2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="FiniteStateMachine.FiniteStateMachine.remap">
+<tt class="descname">remap</tt><big>(</big><em>q0</em>, <em>a</em>, <em>q</em><big>)</big><a class="reference internal" href="_modules/FiniteStateMachine.html#FiniteStateMachine.remap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FiniteStateMachine.FiniteStateMachine.remap" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function changes the output of one transition
+q0 : the initial state
+a : a symbol of the alphabet
+q : the final states. Can be an object or a set of objects</p>
+<p>q0 -a-&gt; set([q])</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
 <dt id="FiniteStateMachine.load_machine">
 <tt class="descclassname">FiniteStateMachine.</tt><tt class="descname">load_machine</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/FiniteStateMachine.html#load_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FiniteStateMachine.load_machine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a single automaton</p>

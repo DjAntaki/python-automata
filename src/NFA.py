@@ -6,13 +6,14 @@ class NFA(FiniteStateMachine):
     """This class represents a non-deterministic finite automaton."""
 
     def __init__(self, states, alphabet, delta, start, accepts, epsilon='epi'):
-        """The inputs to the class are as follows:
-         - states: An iterable containing the states of the NFA. States must be immutable. None is not a valid state.
-         - alphabet: An iterable containing the symbols in the DFA's alphabet. Symbols must be immutable. No need to put epsilon in the alphabet.
-         - delta: A complete function from [states]x[alphabets]->{None | [states] | set([states])}.
-         - start: The state at which the NFA begins operation. Multiple initial states are supported.
-         - accepts: A list containing the "accepting" or "final" states of the NFA.
-         - epsilon : a immutable representing the epsilon transitions symbol
+        """
+        The inputs to the class are as follows :
+        * states: An iterable containing the states of the NFA. States must be immutable. None is not a valid state.
+        * alphabet: An iterable containing the symbols in the DFA's alphabet. Symbols must be immutable. No need to put epsilon in the alphabet.
+        * delta: A complete function from [states]x[alphabets]->{None | [states] | set([states])}.
+        * start: The state at which the NFA begins operation. Multiple initial states are supported.
+        * accepts: A list containing the "accepting" or "final" states of the NFA.
+        * epsilon : a immutable representing the epsilon transitions symbol
 
         Making delta a function rather than a transition table makes it much easier to define certain NFAs.
         If you want to use a transition table, you can just do this:
@@ -70,8 +71,6 @@ class NFA(FiniteStateMachine):
 #
     def step(self, char):
         """Updates the NFA's current state(s) based on a single character of input."""
-        if char not in self.alphabet:
-            raise Exception
 
         self.current_state = self.input(char)
 
@@ -79,17 +78,14 @@ class NFA(FiniteStateMachine):
 
     def input(self, char):
         """Calculate the states resulting on a single character of input based on current state. This function does not change self.current_state. """
-        if char not in self.alphabet:
-            raise Exception
-        else :
-            a = set()
-            q = [self.delta(i,char) for i in self.current_state]
+        a = set()
+        q = [self.delta(i,char) for i in self.current_state]
 
-            for x in q:
-                if type(x) == set or type(x) == list:
-                    a.update(x)
-                elif x is not None :
-                    a.add(x)
+        for x in q:
+            if type(x) == set or type(x) == list:
+                a.update(x)
+            elif x is not None :
+                a.add(x)
         return a
 
 
@@ -105,11 +101,22 @@ class NFA(FiniteStateMachine):
             else :
                 s = x
 
-    def input_sequence(self, char_sequence):
+    def input_sequence(self, char_sequence, verbose = False):
         """Updates the NFA's current state based on an iterable of inputs."""
         if char_sequence != self.EPSILON:
+
+            if verbose:
+                print('Starting state : '+str(self.current_state))
             for char in char_sequence:
+                if char not in self.alphabet:
+                    if verbose:
+                        print('Character '+str(char)+' not in alphabet')
+                    self.current_state = set()
+                    return
                 self.step(char)
+                if (verbose):
+                    print('input : '+ str(char))
+                    print('state(s) : '+str(self.current_state))
 
     def status(self):
         """Indicates whether one of the NFA's current state is accepting."""
@@ -120,11 +127,11 @@ class NFA(FiniteStateMachine):
         self.current_state = self.start.copy()
         self._epsilon_closure()
 
-    def recognizes(self, char_sequence):
+    def recognizes(self, char_sequence, verbose = False):
         """Indicates whether the NFA accepts a given string."""
         state_save = self.current_state
         self.reset()
-        self.input_sequence(char_sequence)
+        self.input_sequence(char_sequence, verbose)
         valid = self.status()
         self.current_state = state_save
         return valid
