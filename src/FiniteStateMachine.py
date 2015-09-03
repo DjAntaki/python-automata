@@ -74,6 +74,26 @@ class FiniteStateMachine:
 # Administrative functions:
 #
 
+    def remap(self, q0, a, q):
+        """
+        This function changes the output of one transition
+        q0 : the initial state
+        a : a symbol of the alphabet
+        q : the final states. Can be an object or a set of objects
+
+        q0 -a-> set([q])
+        """
+
+        assert q0 in self.states
+        assert a in self.alphabet
+        assert q <= self.states
+
+        table = self.get_transition_table()
+        table[q0][a] = q
+
+        self.delta = lambda x,c : table[x][c]
+
+
     def prettyprint(self):
         """Displays all information about the FSM in an easy-to-read way. Not
         actually that easy to read if it has too many states.
