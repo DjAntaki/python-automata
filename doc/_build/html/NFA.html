@@ -54,6 +54,8 @@
             
   <div class="section" id="nfa">
 <h1>NFA<a class="headerlink" href="#nfa" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>Here is an example of an initialisation of a NFA that accepts
 the language (b|)(a(ba)*a)+</p>
 <blockquote>
@@ -63,11 +65,10 @@ the language (b|)(a(ba)*a)+</p>
 <div class="line">&gt;&gt;&gt; accepts = {3}</div>
 <div class="line">&gt;&gt;&gt; start = 0</div>
 <div class="line">&gt;&gt;&gt; epsilon = &#8216;eps&#8217;</div>
-<div class="line">&gt;&gt;&gt; transition_table = {0:{&#8216;a&#8217;:None,&#8217;b&#8217;:1, &#8216;eps&#8217;:1}, 1:{&#8216;a&#8217;:2,&#8217;b&#8217;:None, &#8216;eps&#8217;:None},</div>
-<div class="line">...                     2:{&#8216;a&#8217;:3,&#8217;b&#8217;:1,&#8217;eps&#8217;:None},3:{&#8216;a&#8217;:None,&#8217;b&#8217;:None, &#8216;eps&#8217;:1}}</div>
+<div class="line">&gt;&gt;&gt; transition_table = {0:{&#8216;a&#8217;:None,&#8217;b&#8217;:1, &#8216;eps&#8217;:1}, 1:{&#8216;a&#8217;:2,&#8217;b&#8217;:None, &#8216;eps&#8217;:None}, 2:{&#8216;a&#8217;:3,&#8217;b&#8217;:1,&#8217;eps&#8217;:None},3:{&#8216;a&#8217;:None,&#8217;b&#8217;:None, &#8216;eps&#8217;:1}}</div>
 <div class="line">&gt;&gt;&gt; delta = lambda s,a : transition_table[s][a]</div>
 <div class="line">&gt;&gt;&gt; nfa = NFA(states, alphabet, delta, start, accepts, epsilon)</div>
-<div class="line">&gt;&gt;&gt; nfa.pretty_print2()</div>
+<div class="line">&gt;&gt;&gt; nfa.prettyprint2()</div>
 <div class="line"><br /></div>
 <div class="line">This FSM has 4 states</div>
 <div class="line">Type : &lt;type &#8216;instance&#8217;&gt;</div>
@@ -87,7 +88,10 @@ the language (b|)(a(ba)*a)+</p>
 <div class="line">[&#8216;aa&#8217;, &#8216;baa&#8217;, &#8216;aaaa&#8217;, &#8216;abaa&#8217;, &#8216;baaaa&#8217;, &#8216;babaa&#8217;, &#8216;aaaaaa&#8217;, &#8216;aaabaa&#8217;, &#8216;abaaaa&#8217;, &#8216;ababaa&#8217;, &#8216;baaaaaa&#8217;, &#8216;baaabaa&#8217;, &#8216;babaaaa&#8217;, &#8216;bababaa&#8217;, &#8216;aaaaaaaa&#8217;, &#8216;aaaaabaa&#8217;, &#8216;aaabaaaa&#8217;, &#8216;aaababaa&#8217;, &#8216;abaaaaaa&#8217;, &#8216;abaaabaa&#8217;, &#8216;ababaaaa&#8217;, &#8216;abababaa&#8217;, &#8216;baaaaaaaa&#8217;, &#8216;baaaaabaa&#8217;, &#8216;baaabaaaa&#8217;, &#8216;baaababaa&#8217;, &#8216;babaaaaaa&#8217;, &#8216;babaaabaa&#8217;, &#8216;bababaaaa&#8217;, &#8216;babababaa&#8217;]</div>
 </div>
 </div></blockquote>
-<span class="target" id="module-NFA"></span><dl class="class">
+</div>
+<div class="section" id="module-NFA">
+<span id="documentation"></span><h2>Documentation<a class="headerlink" href="#module-NFA" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
 <dt id="NFA.NFA">
 <em class="property">class </em><tt class="descclassname">NFA.</tt><tt class="descname">NFA</tt><big>(</big><em>states</em>, <em>alphabet</em>, <em>delta</em>, <em>start</em>, <em>accepts</em>, <em>epsilon='epi'</em><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class represents a non-deterministic finite automaton.</p>
@@ -123,14 +127,14 @@ or tuples of hashables.</p>
 <dl class="method">
 <dt id="NFA.NFA.accepted_under">
 <tt class="descname">accepted_under</tt><big>(</big><em>max_length</em><big>)</big><a class="headerlink" href="#NFA.NFA.accepted_under" title="Permalink to this definition">¶</a></dt>
-<dd><p>Try all words of length &lt; than input and return the list of those accepted.</p>
+<dd><p>Try all words of length smaller than input and return the list of those accepted.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="NFA.NFA.accepted_under_word">
 <tt class="descname">accepted_under_word</tt><big>(</big><em>max_word</em><big>)</big><a class="headerlink" href="#NFA.NFA.accepted_under_word" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerate all the accepted word. Which does not makes much sense
-to me when the alphabet is a unordered set of element.</p>
+when the alphabet is a unordered set of element.</p>
 </dd></dl>
 
 <dl class="method">
@@ -144,21 +148,14 @@ to me when the alphabet is a unordered set of element.</p>
 <tt class="descname">getAlphabet</tt><big>(</big><big>)</big><a class="headerlink" href="#NFA.NFA.getAlphabet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a set containing the alphabet.
 If the FSM is non-deterministic, this function does not return the epsilon symbol.
-if you actually want the alphabet with the epsilon, use self.alphabet</p>
+If you actually actually want the alphabet with the epsilon, use self.alphabet</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="NFA.NFA.get_transition_table">
 <tt class="descname">get_transition_table</tt><big>(</big><big>)</big><a class="headerlink" href="#NFA.NFA.get_transition_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build the transition table from the function self.delta defined on [states] X [alphabet] -&gt; ([states])*
-Returns a dictionnary of states where each element is a dictionnary with (key,value) = [alphabet],[states]</p>
-<blockquote>
-<div><div class="line-block">
-<div class="line">&gt;&gt;&gt; x = NFA(state=set() )</div>
-<div class="line">&gt;&gt;&gt; t = x.get_transition_table()</div>
-<div class="line">&gt;&gt;&gt; t[0][&#8216;a&#8217;]</div>
-</div>
-</div></blockquote>
+<dd><p>Build the transition table from the function self.delta defined on [state] X [alphabet] -&gt; ([state])*.
+Returns a dictionnary of states where each element is a dictionnary with (key,value) = symbol in inpute, resulting state(s)</p>
 </dd></dl>
 
 <dl class="method">
@@ -174,32 +171,22 @@ Returns a dictionnary of states where each element is a dictionnary with (key,va
 </dd></dl>
 
 <dl class="method">
-<dt id="NFA.NFA.pretty_print">
-<tt class="descname">pretty_print</tt><big>(</big><big>)</big><a class="headerlink" href="#NFA.NFA.pretty_print" title="Permalink to this definition">¶</a></dt>
-<dd><p>Displays all information about the NFA in an easy-to-read way. Not
+<dt id="NFA.NFA.prettyprint">
+<tt class="descname">prettyprint</tt><big>(</big><big>)</big><a class="headerlink" href="#NFA.NFA.prettyprint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays all information about the FSM in an easy-to-read way. Not
 actually that easy to read if it has too many states.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="NFA.NFA.pretty_print2">
-<tt class="descname">pretty_print2</tt><big>(</big><big>)</big><a class="headerlink" href="#NFA.NFA.pretty_print2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.</p>
+<dt id="NFA.NFA.prettyprint2">
+<tt class="descname">prettyprint2</tt><big>(</big><big>)</big><a class="headerlink" href="#NFA.NFA.prettyprint2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alternative print. Easier to read.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="NFA.NFA.recognizes">
 <tt class="descname">recognizes</tt><big>(</big><em>char_sequence</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.recognizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.recognizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates whether the NFA accepts a given string.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="NFA.NFA.remap">
-<tt class="descname">remap</tt><big>(</big><em>q0</em>, <em>a</em>, <em>q</em><big>)</big><a class="headerlink" href="#NFA.NFA.remap" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function changes the output of one transition
-q0 : the initial state
-a : a symbol of the alphabet
-q : the final states. Can be an object or a set of objects</p>
-<p>q0 -a-&gt; set([q])</p>
 </dd></dl>
 
 <dl class="method">
@@ -239,6 +226,7 @@ q : the final states. Can be an object or a set of objects</p>
 </dd></dl>
 
 </div>
+</div>
 
 
           </div>
@@ -246,6 +234,15 @@ q : the final states. Can be an object or a set of objects</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">NFA</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#module-NFA">Documentation</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="DFA.html"
                         title="previous chapter">DFA</a></p>

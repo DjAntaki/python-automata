@@ -14,7 +14,7 @@ class FiniteStateMachine:
         """
         Returns a set containing the alphabet.
         If the FSM is non-deterministic, this function does not return the epsilon symbol.
-        if you actually actually want the alphabet with the epsilon, use self.alphabet
+        If you actually actually want the alphabet with the epsilon, use self.alphabet
         """
         from NFA import NFA
         if isinstance(self,NFA):
@@ -23,12 +23,10 @@ class FiniteStateMachine:
         return self.alphabet
 
     def get_transition_table(self):
-        """Build the transition table from the function self.delta defined on [states] X [alphabet] -> ([states])*
-        Returns a dictionnary of states where each element is a dictionnary with (key,value) = [alphabet],[states]
+        """Build the transition table from the function self.delta defined on [state] X [alphabet] -> ([state])*.
+        Returns a dictionnary of states where each element is a dictionnary with (key,value) = symbol in inpute, resulting state(s)
 
-         | >>> x = NFA(state=set() )
-         | >>> t = x.get_transition_table()
-         | >>> t[0]['a']
+
 
         """
         d = {}
@@ -73,35 +71,11 @@ class FiniteStateMachine:
         return accepted_words_list
 
 #
-#   To modify an FSM:
-#
-
-    def remap(self, q0, a, q):
-        """
-        This function changes the output of one transition
-        q0 : the initial state
-        a : a symbol of the alphabet
-        q : the final states. Can be an object or a set of objects
-
-        q0 -a-> set([q])
-        """
-
-        assert q0 in self.states
-        assert a in self.alphabet
-        assert q <= self.states
-
-        table = self.get_transition_table()
-        table[q0][a] = q
-
-        self.delta = lambda x,c : table[x][c]
-
-
-#
 # Administrative functions:
 #
 
     def prettyprint(self):
-        """Displays all information about the NFA in an easy-to-read way. Not
+        """Displays all information about the FSM in an easy-to-read way. Not
         actually that easy to read if it has too many states.
         """
         print("")
@@ -121,8 +95,7 @@ class FiniteStateMachine:
         print("")
 
     def prettyprint2(self):
-        """Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.
-        """
+        """Alternative print. Easier to read."""
         def str2(x):
             t = type(x)
             if t == set or t == frozenset or t == list:
@@ -152,7 +125,7 @@ class FiniteStateMachine:
         print("")
 
 def save_machine(FA, path):
-    """Saves a single automaton"""
+    """Saves a single automaton using Pickle"""
 
     FA = FA.copy()
 
@@ -165,7 +138,7 @@ def save_machine(FA, path):
 
 
 def load_machine(path):
-    """ Loads a single automaton """
+    """ Loads a single automaton using Pickle"""
     FA = pickle.load(open(path, 'rb'))
     d = FA.delta.copy()
 

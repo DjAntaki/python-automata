@@ -1,8 +1,11 @@
 DFA
 ===
 
+Example
+-------
+
 Here is an example of an initialisation of a DFA that accepts
-the language a*ba(ba*ba)*a
+the language (bab)*baa
 
  | >>> states = [0,1,2,3]
  | >>> alphabet = ['a','b']
@@ -11,7 +14,7 @@ the language a*ba(ba*ba)*a
  | >>> transition_table = {0:{'a':None,'b':1}, 1:{'a':2,'b':None}, 2:{'a':3,'b':0},3:{'a':None,'b':None}}
  | >>> delta = lambda s,a : transition_table[s][a]
  | >>> dfa = DFA(states, alphabet, delta, start, accepts)
- | >>> dfa.pretty_print2()
+ | >>> dfa.prettyprint2()
  |
  | This FSM has 4 states
  | Type : <type 'instance'>
@@ -27,7 +30,12 @@ the language a*ba(ba*ba)*a
  | ('Current state:', '0')
  | ('Currently accepting:', False)
  |
- | >>>
+ | >>> dfa.accepted_under(10)
+ | ['baa', 'babbaa', 'babbabbaa']
+
+
+Documentation
+-------------
 
 .. automodule:: DFA
    :members:

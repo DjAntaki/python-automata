@@ -54,8 +54,10 @@
             
   <div class="section" id="dfa">
 <h1>DFA<a class="headerlink" href="#dfa" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>Here is an example of an initialisation of a DFA that accepts
-the language a*ba(ba*ba)*a</p>
+the language (bab)*baa</p>
 <blockquote>
 <div><div class="line-block">
 <div class="line">&gt;&gt;&gt; states = [0,1,2,3]</div>
@@ -65,7 +67,7 @@ the language a*ba(ba*ba)*a</p>
 <div class="line">&gt;&gt;&gt; transition_table = {0:{&#8216;a&#8217;:None,&#8217;b&#8217;:1}, 1:{&#8216;a&#8217;:2,&#8217;b&#8217;:None}, 2:{&#8216;a&#8217;:3,&#8217;b&#8217;:0},3:{&#8216;a&#8217;:None,&#8217;b&#8217;:None}}</div>
 <div class="line">&gt;&gt;&gt; delta = lambda s,a : transition_table[s][a]</div>
 <div class="line">&gt;&gt;&gt; dfa = DFA(states, alphabet, delta, start, accepts)</div>
-<div class="line">&gt;&gt;&gt; dfa.pretty_print2()</div>
+<div class="line">&gt;&gt;&gt; dfa.prettyprint2()</div>
 <div class="line"><br /></div>
 <div class="line">This FSM has 4 states</div>
 <div class="line">Type : &lt;type &#8216;instance&#8217;&gt;</div>
@@ -81,27 +83,17 @@ the language a*ba(ba*ba)*a</p>
 <div class="line">(&#8216;Current state:&#8217;, &#8216;0&#8217;)</div>
 <div class="line">(&#8216;Currently accepting:&#8217;, False)</div>
 <div class="line"><br /></div>
-<div class="line">&gt;&gt;&gt;</div>
+<div class="line">&gt;&gt;&gt; dfa.accepted_under(10)</div>
+<div class="line">[&#8216;baa&#8217;, &#8216;babbaa&#8217;, &#8216;babbabbaa&#8217;]</div>
 </div>
 </div></blockquote>
-<span class="target" id="module-DFA"></span><dl class="class">
+</div>
+<div class="section" id="module-DFA">
+<span id="documentation"></span><h2>Documentation<a class="headerlink" href="#module-DFA" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
 <dt id="DFA.DFA">
 <em class="property">class </em><tt class="descclassname">DFA.</tt><tt class="descname">DFA</tt><big>(</big><em>states</em>, <em>alphabet</em>, <em>delta</em>, <em>start</em>, <em>accepts</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class represents a deterministic finite automaton.</p>
-<dl class="method">
-<dt id="DFA.DFA.DFCA_minimize">
-<tt class="descname">DFCA_minimize</tt><big>(</big><em>l=None</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.DFCA_minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.DFCA_minimize" title="Permalink to this definition">¶</a></dt>
-<dd><p>DFCA minimization</p>
-<p>Input: &#8220;self&#8221; is a DFA accepting a finite language</p>
-<p>Result: &#8220;self&#8221; is DFCA-minimized, and the returned value is the length of the longest word accepted by the original DFA</p>
-<p>See &#8220;Minimal cover-automata for finite languages&#8221; for context on DFCAs, and
-&#8220;An O(n^2) Algorithm for Constructing Minimal Cover Automata for Finite Languages&#8221;
-for the source of this algorithm (Campeanu, Paun, Santean, and Yu). We follow their
-algorithm exactly, except that &#8220;l&#8221; is optionally calculated for you, and the state-
-ordering is automatically created.</p>
-<p>There exists a faster, O(n*logn)-time algorithm due to Korner, from CIAA 2002.</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="DFA.DFA.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>states</em>, <em>alphabet</em>, <em>delta</em>, <em>start</em>, <em>accepts</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.__init__" title="Permalink to this definition">¶</a></dt>
@@ -133,14 +125,14 @@ or tuples of hashables.</p>
 <dl class="method">
 <dt id="DFA.DFA.accepted_under">
 <tt class="descname">accepted_under</tt><big>(</big><em>max_length</em><big>)</big><a class="headerlink" href="#DFA.DFA.accepted_under" title="Permalink to this definition">¶</a></dt>
-<dd><p>Try all words of length &lt; than input and return the list of those accepted.</p>
+<dd><p>Try all words of length smaller than input and return the list of those accepted.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="DFA.DFA.accepted_under_word">
 <tt class="descname">accepted_under_word</tt><big>(</big><em>max_word</em><big>)</big><a class="headerlink" href="#DFA.DFA.accepted_under_word" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerate all the accepted word. Which does not makes much sense
-to me when the alphabet is a unordered set of element.</p>
+when the alphabet is a unordered set of element.</p>
 </dd></dl>
 
 <dl class="method">
@@ -164,6 +156,20 @@ Returns the hash mapping each old state to its new representative.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="DFA.DFA.dfca_minimize">
+<tt class="descname">dfca_minimize</tt><big>(</big><em>l=None</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.dfca_minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.dfca_minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>DFCA minimization
+&#8220;self&#8221; is a DFA accepting a finite language
+Result: &#8220;self&#8221; is DFCA-minimized, and the returned value is the length of the longest word accepted by the original DFA</p>
+<p>See &#8220;Minimal cover-automata for finite languages&#8221; for context on DFCAs, and
+&#8220;An O(n^2) Algorithm for Constructing Minimal Cover Automata for Finite Languages&#8221;
+for the source of this algorithm (Campeanu, Paun, Santean, and Yu). We follow their
+algorithm exactly, except that &#8220;l&#8221; is optionally calculated for you, and the state-
+ordering is automatically created.</p>
+<p>There exists a faster, O(n*logn)-time algorithm due to Korner, from CIAA 2002.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="DFA.DFA.f_equivalence_classes">
 <tt class="descname">f_equivalence_classes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.f_equivalence_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.f_equivalence_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a partition of the states into finite-difference equivalence clases, using
@@ -175,21 +181,14 @@ the experimental O(n^2) algorithm.</p>
 <tt class="descname">getAlphabet</tt><big>(</big><big>)</big><a class="headerlink" href="#DFA.DFA.getAlphabet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a set containing the alphabet.
 If the FSM is non-deterministic, this function does not return the epsilon symbol.
-if you actually want the alphabet with the epsilon, use self.alphabet</p>
+If you actually actually want the alphabet with the epsilon, use self.alphabet</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="DFA.DFA.get_transition_table">
 <tt class="descname">get_transition_table</tt><big>(</big><big>)</big><a class="headerlink" href="#DFA.DFA.get_transition_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build the transition table from the function self.delta defined on [states] X [alphabet] -&gt; ([states])*
-Returns a dictionnary of states where each element is a dictionnary with (key,value) = [alphabet],[states]</p>
-<blockquote>
-<div><div class="line-block">
-<div class="line">&gt;&gt;&gt; x = NFA(state=set() )</div>
-<div class="line">&gt;&gt;&gt; t = x.get_transition_table()</div>
-<div class="line">&gt;&gt;&gt; t[0][&#8216;a&#8217;]</div>
-</div>
-</div></blockquote>
+<dd><p>Build the transition table from the function self.delta defined on [state] X [alphabet] -&gt; ([state])*.
+Returns a dictionnary of states where each element is a dictionnary with (key,value) = symbol in inpute, resulting state(s)</p>
 </dd></dl>
 
 <dl class="method">
@@ -258,16 +257,16 @@ are finitely many strings that reach it from the start state.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="DFA.DFA.pretty_print">
-<tt class="descname">pretty_print</tt><big>(</big><big>)</big><a class="headerlink" href="#DFA.DFA.pretty_print" title="Permalink to this definition">¶</a></dt>
-<dd><p>Displays all information about the NFA in an easy-to-read way. Not
+<dt id="DFA.DFA.prettyprint">
+<tt class="descname">prettyprint</tt><big>(</big><big>)</big><a class="headerlink" href="#DFA.DFA.prettyprint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays all information about the FSM in an easy-to-read way. Not
 actually that easy to read if it has too many states.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="DFA.DFA.pretty_print2">
-<tt class="descname">pretty_print2</tt><big>(</big><big>)</big><a class="headerlink" href="#DFA.DFA.pretty_print2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.</p>
+<dt id="DFA.DFA.prettyprint2">
+<tt class="descname">prettyprint2</tt><big>(</big><big>)</big><a class="headerlink" href="#DFA.DFA.prettyprint2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alternative print. Easier to read.</p>
 </dd></dl>
 
 <dl class="method">
@@ -287,16 +286,6 @@ parameter &#8220;inclusive&#8221; indicates that q0 should always be included.</
 <dt id="DFA.DFA.recognizes">
 <tt class="descname">recognizes</tt><big>(</big><em>char_sequence</em><big>)</big><a class="reference internal" href="_modules/DFA.html#DFA.recognizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.recognizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates whether the DFA accepts a given string.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="DFA.DFA.remap">
-<tt class="descname">remap</tt><big>(</big><em>q0</em>, <em>a</em>, <em>q</em><big>)</big><a class="headerlink" href="#DFA.DFA.remap" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function changes the output of one transition
-q0 : the initial state
-a : a symbol of the alphabet
-q : the final states. Can be an object or a set of objects</p>
-<p>q0 -a-&gt; set([q])</p>
 </dd></dl>
 
 <dl class="method">
@@ -430,6 +419,7 @@ the states should be accepting.</p>
 </dd></dl>
 
 </div>
+</div>
 
 
           </div>
@@ -437,6 +427,15 @@ the states should be accepting.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">DFA</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#module-DFA">Documentation</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="FiniteStateMachine.html"
                         title="previous chapter">FiniteStateMachine</a></p>

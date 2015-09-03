@@ -72,7 +72,7 @@ class DFA(FiniteStateMachine):
         if verbose:
             print('Starting state : '+str(self.states))
         for char in char_sequence:
-            if len (self.current_state) == 0:
+            if self.current_state is None:
                 return
             if char not in self.alphabet:
                 if verbose:

@@ -121,7 +121,7 @@
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s">&#39;Starting state : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">char_sequence</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">return</span>
             <span class="k">if</span> <span class="n">char</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -489,10 +489,9 @@
             <span class="k">return</span> <span class="n">longest</span>
         <span class="k">return</span> <span class="n">long_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="DFA.DFCA_minimize"><a class="viewcode-back" href="../DFA.html#DFA.DFA.DFCA_minimize">[docs]</a>    <span class="k">def</span> <span class="nf">DFCA_minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DFA.dfca_minimize"><a class="viewcode-back" href="../DFA.html#DFA.DFA.dfca_minimize">[docs]</a>    <span class="k">def</span> <span class="nf">dfca_minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;DFCA minimization</span>
-
-<span class="sd">        Input: &quot;self&quot; is a DFA accepting a finite language \n</span>
+<span class="sd">        &quot;self&quot; is a DFA accepting a finite language</span>
 <span class="sd">        Result: &quot;self&quot; is DFCA-minimized, and the returned value is the length of the longest word accepted by the original DFA</span>
 
 <span class="sd">        See &quot;Minimal cover-automata for finite languages&quot; for context on DFCAs, and</span>
@@ -693,7 +692,7 @@
     <span class="n">D2</span> <span class="o">=</span> <span class="n">D1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">D2</span><span class="o">.</span><span class="n">hyper_minimize</span><span class="p">()</span>
     <span class="n">D3</span> <span class="o">=</span> <span class="n">symmetric_difference</span><span class="p">(</span><span class="n">D1</span><span class="p">,</span> <span class="n">D2</span><span class="p">)</span>
-    <span class="n">l</span> <span class="o">=</span> <span class="n">D3</span><span class="o">.</span><span class="n">DFCA_minimize</span><span class="p">()</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">D3</span><span class="o">.</span><span class="n">dfca_minimize</span><span class="p">()</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">D2</span><span class="p">,</span> <span class="p">(</span><span class="n">D3</span><span class="p">,</span> <span class="n">l</span><span class="p">))</span></div>
 </pre></div>
 

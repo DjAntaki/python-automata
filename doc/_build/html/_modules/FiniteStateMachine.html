@@ -56,14 +56,14 @@
 
 <div class="viewcode-block" id="FiniteStateMachine"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine">[docs]</a><span class="k">class</span> <span class="nc">FiniteStateMachine</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An abstract class that is both inherited by DFA and NFA.</span>
+<span class="sd">    An abstract class that is both inherited by deterministic automata (DFA) and non-deterministic automata (NFA).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="FiniteStateMachine.getAlphabet"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine.getAlphabet">[docs]</a>    <span class="k">def</span> <span class="nf">getAlphabet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a set containing the alphabet.</span>
 <span class="sd">        If the FSM is non-deterministic, this function does not return the epsilon symbol.</span>
-<span class="sd">        if you actually want the alphabet with the epsilon, use self.alphabet</span>
+<span class="sd">        If you actually actually want the alphabet with the epsilon, use self.alphabet</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">NFA</span> <span class="kn">import</span> <span class="n">NFA</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">NFA</span><span class="p">):</span>
@@ -72,12 +72,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span>
 </div>
 <div class="viewcode-block" id="FiniteStateMachine.get_transition_table"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine.get_transition_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_transition_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Build the transition table from the function self.delta defined on [states] X [alphabet] -&gt; ([states])*</span>
-<span class="sd">        Returns a dictionnary of states where each element is a dictionnary with (key,value) = [alphabet],[states]</span>
+        <span class="sd">&quot;&quot;&quot;Build the transition table from the function self.delta defined on [state] X [alphabet] -&gt; ([state])*.</span>
+<span class="sd">        Returns a dictionnary of states where each element is a dictionnary with (key,value) = symbol in inpute, resulting state(s)</span>
 
-<span class="sd">         | &gt;&gt;&gt; x = NFA(state=set() )</span>
-<span class="sd">         | &gt;&gt;&gt; t = x.get_transition_table()</span>
-<span class="sd">         | &gt;&gt;&gt; t[0][&#39;a&#39;]</span>
+
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
@@ -90,7 +88,7 @@
 </div>
 <div class="viewcode-block" id="FiniteStateMachine.accepted_under"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine.accepted_under">[docs]</a>    <span class="k">def</span> <span class="nf">accepted_under</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_length</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Try all words of length &lt; than input and return the list of those accepted.</span>
+<span class="sd">        Try all words of length smaller than input and return the list of those accepted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">accepted_words_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizes</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">):</span>
@@ -107,7 +105,7 @@
 </div>
 <div class="viewcode-block" id="FiniteStateMachine.accepted_under_word"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine.accepted_under_word">[docs]</a>    <span class="k">def</span> <span class="nf">accepted_under_word</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_word</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Enumerate all the accepted word. Which does not makes much sense</span>
-<span class="sd">        to me when the alphabet is a unordered set of element.</span>
+<span class="sd">         when the alphabet is a unordered set of element.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">accepted_words_list</span> <span class="o">=</span> <span class="p">[]</span>
@@ -122,35 +120,11 @@
         <span class="k">return</span> <span class="n">accepted_words_list</span>
 
 <span class="c">#</span>
-<span class="c">#   To modify an FSM:</span>
-<span class="c">#</span>
-</div>
-<div class="viewcode-block" id="FiniteStateMachine.remap"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine.remap">[docs]</a>    <span class="k">def</span> <span class="nf">remap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q0</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function changes the output of one transition</span>
-<span class="sd">        q0 : the initial state</span>
-<span class="sd">        a : a symbol of the alphabet</span>
-<span class="sd">        q : the final states. Can be an object or a set of objects</span>
-
-<span class="sd">        q0 -a-&gt; set([q])</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">assert</span> <span class="n">q0</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
-        <span class="k">assert</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span>
-        <span class="k">assert</span> <span class="n">q</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
-
-        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_transition_table</span><span class="p">()</span>
-        <span class="n">table</span><span class="p">[</span><span class="n">q0</span><span class="p">][</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">c</span> <span class="p">:</span> <span class="n">table</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">c</span><span class="p">]</span>
-
-
-<span class="c">#</span>
 <span class="c"># Administrative functions:</span>
 <span class="c">#</span>
 </div>
-<div class="viewcode-block" id="FiniteStateMachine.pretty_print"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine.pretty_print">[docs]</a>    <span class="k">def</span> <span class="nf">pretty_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Displays all information about the NFA in an easy-to-read way. Not</span>
+<div class="viewcode-block" id="FiniteStateMachine.prettyprint"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine.prettyprint">[docs]</a>    <span class="k">def</span> <span class="nf">prettyprint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Displays all information about the FSM in an easy-to-read way. Not</span>
 <span class="sd">        actually that easy to read if it has too many states.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
@@ -169,9 +143,8 @@
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;Currently accepting:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">())</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="FiniteStateMachine.pretty_print2"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine.pretty_print2">[docs]</a>    <span class="k">def</span> <span class="nf">pretty_print2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="FiniteStateMachine.prettyprint2"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine.prettyprint2">[docs]</a>    <span class="k">def</span> <span class="nf">prettyprint2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alternative print. Easier to read.&quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">str2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="n">t</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="nb">set</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">==</span> <span class="nb">frozenset</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
@@ -201,7 +174,7 @@
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
 </div></div>
 <div class="viewcode-block" id="save_machine"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.save_machine">[docs]</a><span class="k">def</span> <span class="nf">save_machine</span><span class="p">(</span><span class="n">FA</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Saves a single automaton&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Saves a single automaton using Pickle&quot;&quot;&quot;</span>
 
     <span class="n">FA</span> <span class="o">=</span> <span class="n">FA</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -214,7 +187,7 @@
 
 </div>
 <div class="viewcode-block" id="load_machine"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.load_machine">[docs]</a><span class="k">def</span> <span class="nf">load_machine</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Loads a single automaton &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Loads a single automaton using Pickle&quot;&quot;&quot;</span>
     <span class="n">FA</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">))</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">FA</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 

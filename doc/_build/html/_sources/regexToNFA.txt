@@ -1,7 +1,7 @@
 Regex to NFA
 =====
 
-RegexToNFA File contains the procedure used to build a non-deterministic finite automaton from a regex.
+RegexToNFA.py file contains the procedure used to build a non-deterministic finite automaton from a regex.
 
 Only the following basic operators are accepted with the following priority :
  1. parentheses "(x)"
@@ -23,7 +23,6 @@ We will use it to create a NFA :
  | ['','aa', 'baa', 'aba', 'aab', 'bbbb', 'bbaa', 'baba', 'baab', 'abba', 'abab', 'aabb', 'aaaa', 'bbbba', 'bbbab', 'bbbaa',
  | 'bbabb', 'bbaba', 'bbaab', 'babbb', 'babba', 'babab', 'baabb', 'baaaa', 'abbbb', 'abbba', 'abbab', 'ababb', 'abaaa',
  | 'aabbb', 'aabaa', 'aaaba', 'aaaab']
- | >>>
 
 
 .. automodule:: regexToNFA
