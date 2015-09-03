@@ -58,8 +58,6 @@ If you do not want to save, press enter. automatas/dfa1.aut
 
 """
 
-automata = {}
-
 def save_prompt(FA):
     """
     Interactive prompt for saving a finite automaton. Creates a file at entered path.
@@ -163,7 +161,7 @@ def dfa_input():
 
 #   def __init__(self, states, alphabet, delta, start, accepts, epsilon='epi'):
     n = DFA(states,alphabet,lambda x,y:transition_table[x][y],0,finals)
-    n.label = label
+    
     print("You have sucessfully created a DFA.")
 
     return n
@@ -261,36 +259,7 @@ def nfa_input():
 #   def __init__(self, states, alphabet, delta, start, accepts, epsilon='epi'):
     alphabet.remove('epsilon')
     n = NFA(states,alphabet,lambda x,y:transition_table[x][y],0,finals, epsilon="epsilon")
-    n.label = label
+    
     print("You have sucessfully created a NFA.")
 
     return n
-
-if __name__ == '__main__':
-    print("This script needs to be run with the -i command.")
-
-    while(True):
-
-        print("Welcome to the make-your-own-automata prompt interface!")
-        print("Choose between : ")
-        print("1.create DFA")
-        print("2.create NFA")
-        print("x. Go to python prompt and access created automata")
-
-        tmp = raw_input()
-        if(tmp == '1'):
-            dfa = dfa_input()
-            automata[dfa.label] = dfa
-            save_prompt(dfa)
-        elif(tmp == '2'):
-
-            nfa = nfa_input()
-            automata[nfa.label] = nfa
-            save_prompt(nfa)
-        elif(tmp == 'x'):
-            break
-        else :
-            print("Unrecognized answer.")
-            print(tmp)
-
-    print("See dictionnary \"automata\" for created state machines.")

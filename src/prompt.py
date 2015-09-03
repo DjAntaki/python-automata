@@ -212,31 +212,3 @@ def nfa_input():
 
     return n
 
-if __name__ == '__main__':
-    print("This script needs to be run with the -i command.")
-
-    while(True):
-
-        print("Welcome to the make-your-own-automata prompt interface!")
-        print("Choose between : ")
-        print("1.create DFA")
-        print("2.create NFA")
-        print("x. Go to python prompt and access created automata")
-
-        tmp = input()
-        if(tmp == '1'):
-            dfa = dfa_input()
-            saved[dfa.label] = dfa
-            save_prompt(dfa)
-        elif(tmp == '2'):
-
-            nfa = nfa_input()
-            saved[nfa.label] = nfa
-            save_prompt(nfa)
-        elif(tmp == 'x'):
-            break
-        else :
-            print("Unrecognized answer.")
-            print(tmp)
-
-    print("See dictionnary \"saved\" for created state machines.")
