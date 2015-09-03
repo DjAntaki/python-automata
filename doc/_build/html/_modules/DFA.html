@@ -116,11 +116,23 @@
         <span class="sd">&quot;&quot;&quot;Updates the DFA&#39;s current state based on a single character of input.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">,</span> <span class="n">char</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="DFA.step_sequence"><a class="viewcode-back" href="../DFA.html#DFA.DFA.step_sequence">[docs]</a>    <span class="k">def</span> <span class="nf">step_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_sequence</span><span class="p">):</span>
+<div class="viewcode-block" id="DFA.step_sequence"><a class="viewcode-back" href="../DFA.html#DFA.DFA.step_sequence">[docs]</a>    <span class="k">def</span> <span class="nf">step_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_sequence</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Updates the DFA&#39;s current state based on an iterable of inputs.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Starting state : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">char_sequence</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">char</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Character &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">char</span><span class="p">)</span><span class="o">+</span><span class="s">&#39; not in alphabet&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                <span class="k">return</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
-</div>
+            <span class="k">if</span> <span class="p">(</span><span class="n">verbose</span><span class="p">):</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&#39;input : &#39;</span><span class="o">+</span> <span class="n">char</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&#39;state(s) : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">))</span></div>
 <div class="viewcode-block" id="DFA.status"><a class="viewcode-back" href="../DFA.html#DFA.DFA.status">[docs]</a>    <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Indicates whether the DFA&#39;s current state is accepting.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">accepts</span><span class="p">)</span>

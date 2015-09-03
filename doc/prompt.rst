@@ -13,8 +13,7 @@ You can then call one of the two prompt function (dfa_input or nfa_input). Those
 
  | >>> nfa1 = nfa_input()
 
-The instruction given by the prompt should be sufficient for good use.
-
+The instructions given by the prompt should be sufficient for good use.
 
 .. automodule:: prompt
    :members:

@@ -120,8 +120,6 @@
 <span class="c">#</span></div>
 <div class="viewcode-block" id="NFA.step"><a class="viewcode-back" href="../NFA.html#NFA.NFA.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Updates the NFA&#39;s current state(s) based on a single character of input.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">char</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
 
@@ -129,17 +127,14 @@
 </div>
 <div class="viewcode-block" id="NFA.input"><a class="viewcode-back" href="../NFA.html#NFA.NFA.input">[docs]</a>    <span class="k">def</span> <span class="nf">input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculate the states resulting on a single character of input based on current state. This function does not change self.current_state. &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">char</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span>
-        <span class="k">else</span> <span class="p">:</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">char</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">char</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">]</span>
 
-            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">q</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
-                    <span class="n">a</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="p">:</span>
-                    <span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">q</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="p">:</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">a</span>
 
 
@@ -155,11 +150,22 @@
             <span class="k">else</span> <span class="p">:</span>
                 <span class="n">s</span> <span class="o">=</span> <span class="n">x</span>
 </div>
-<div class="viewcode-block" id="NFA.input_sequence"><a class="viewcode-back" href="../NFA.html#NFA.NFA.input_sequence">[docs]</a>    <span class="k">def</span> <span class="nf">input_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_sequence</span><span class="p">):</span>
+<div class="viewcode-block" id="NFA.input_sequence"><a class="viewcode-back" href="../NFA.html#NFA.NFA.input_sequence">[docs]</a>    <span class="k">def</span> <span class="nf">input_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_sequence</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Updates the NFA&#39;s current state based on an iterable of inputs.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">char_sequence</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">EPSILON</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&#39;Starting state : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">char_sequence</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">char</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s">&#39;Character &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">char</span><span class="p">)</span><span class="o">+</span><span class="s">&#39; not in alphabet&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                    <span class="k">return</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">verbose</span><span class="p">):</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;input : &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">char</span><span class="p">))</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;state(s) : &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_state</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="NFA.status"><a class="viewcode-back" href="../NFA.html#NFA.NFA.status">[docs]</a>    <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Indicates whether one of the NFA&#39;s current state is accepting.&quot;&quot;&quot;</span>
@@ -170,11 +176,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon_closure</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="NFA.recognizes"><a class="viewcode-back" href="../NFA.html#NFA.NFA.recognizes">[docs]</a>    <span class="k">def</span> <span class="nf">recognizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_sequence</span><span class="p">):</span>
+<div class="viewcode-block" id="NFA.recognizes"><a class="viewcode-back" href="../NFA.html#NFA.NFA.recognizes">[docs]</a>    <span class="k">def</span> <span class="nf">recognizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char_sequence</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Indicates whether the NFA accepts a given string.&quot;&quot;&quot;</span>
         <span class="n">state_save</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">input_sequence</span><span class="p">(</span><span class="n">char_sequence</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_sequence</span><span class="p">(</span><span class="n">char_sequence</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="n">state_save</span>
         <span class="k">return</span> <span class="n">valid</span>

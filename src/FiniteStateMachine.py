@@ -7,14 +7,14 @@ from itertools import product
 
 class FiniteStateMachine:
     """
-    An abstract class that is both inherited by DFA and NFA.
+    An abstract class that is both inherited by deterministic automata (DFA) and non-deterministic automata (NFA).
     """
 
     def getAlphabet(self):
         """
         Returns a set containing the alphabet.
         If the FSM is non-deterministic, this function does not return the epsilon symbol.
-        if you actually want the alphabet with the epsilon, use self.alphabet
+        if you actually actually want the alphabet with the epsilon, use self.alphabet
         """
         from NFA import NFA
         if isinstance(self,NFA):
@@ -41,7 +41,7 @@ class FiniteStateMachine:
 
     def accepted_under(self, max_length):
         """
-        Try all words of length < than input and return the list of those accepted.
+        Try all words of length smaller than input and return the list of those accepted.
         """
         accepted_words_list = []
         if self.recognizes(''):
@@ -58,7 +58,7 @@ class FiniteStateMachine:
 
     def accepted_under_word(self, max_word):
         """Enumerate all the accepted word. Which does not makes much sense
-        to me when the alphabet is a unordered set of element.
+         when the alphabet is a unordered set of element.
         """
 
         accepted_words_list = []
@@ -100,7 +100,7 @@ class FiniteStateMachine:
 # Administrative functions:
 #
 
-    def pretty_print(self):
+    def prettyprint(self):
         """Displays all information about the NFA in an easy-to-read way. Not
         actually that easy to read if it has too many states.
         """
@@ -120,7 +120,7 @@ class FiniteStateMachine:
         print("Currently accepting:", self.status())
         print("")
 
-    def pretty_print2(self):
+    def prettyprint2(self):
         """Alternative print. Easier to read for DFA that are the result of the convertion of a NFA.
         """
         def str2(x):

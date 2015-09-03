@@ -1,19 +1,19 @@
 Prompt Interface
-=============
+================
 
-To use the interactive prompt interface, use one of the two following command :
+To run the interactive prompt interface, use one of the two following command :
 
-.../python_automata$ python -i src/prompt2.py
-.../python_automata$ python3 -i src/prompt.py
-
-
-You will be then asked
+ | .../python_automata$ python -i src/prompt2.py
+ | .../python_automata$ python3 -i src/prompt.py
 
 
+You can then call one of the two prompt function (dfa_input or nfa_input). Those function return respectively a deterministic and a non-deterministic finite automaton.
 
-Once you finish creating automata you can choose the option x the leave the prompt loop and access the python interactive prompt. Your created automata will be in the dictionnary 'saved'
+ | >>> dfa1 = dfa_input()
 
+ | >>> nfa1 = nfa_input()
 
+The instructions given by the prompt should be sufficient for good use.
 
 .. automodule:: prompt
    :members:

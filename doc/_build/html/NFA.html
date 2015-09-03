@@ -55,37 +55,37 @@
   <div class="section" id="nfa">
 <h1>NFA<a class="headerlink" href="#nfa" title="Permalink to this headline">¶</a></h1>
 <p>Here is an example of an initialisation of a NFA that accepts
-the language a*ba(ba*ba)*a</p>
+the language (b|)(a(ba)*a)+</p>
 <blockquote>
 <div><div class="line-block">
 <div class="line">&gt;&gt;&gt; states = [0,1,2,3]</div>
 <div class="line">&gt;&gt;&gt; alphabet = [&#8216;a&#8217;,&#8217;b&#8217;]</div>
 <div class="line">&gt;&gt;&gt; accepts = {3}</div>
 <div class="line">&gt;&gt;&gt; start = 0</div>
-<div class="line">&gt;&gt;&gt; transition_table = {0:{&#8216;a&#8217;:None,&#8217;b&#8217;:1}, 1:{&#8216;a&#8217;:2,&#8217;b&#8217;:None},</div>
-<div class="line-block">
-<div class="line">2:{&#8216;a&#8217;:3,&#8217;b&#8217;:0},3:{&#8216;a&#8217;:None,&#8217;b&#8217;:None, &#8216;c&#8217;:None}}</div>
-</div>
+<div class="line">&gt;&gt;&gt; epsilon = &#8216;eps&#8217;</div>
+<div class="line">&gt;&gt;&gt; transition_table = {0:{&#8216;a&#8217;:None,&#8217;b&#8217;:1, &#8216;eps&#8217;:1}, 1:{&#8216;a&#8217;:2,&#8217;b&#8217;:None, &#8216;eps&#8217;:None},</div>
+<div class="line">...                     2:{&#8216;a&#8217;:3,&#8217;b&#8217;:1,&#8217;eps&#8217;:None},3:{&#8216;a&#8217;:None,&#8217;b&#8217;:None, &#8216;eps&#8217;:1}}</div>
 <div class="line">&gt;&gt;&gt; delta = lambda s,a : transition_table[s][a]</div>
-<div class="line">&gt;&gt;&gt; dfa = DFA(states, alphabet, delta, start, accepts)</div>
-<div class="line">&gt;&gt;&gt; dfa.pretty_print2()</div>
+<div class="line">&gt;&gt;&gt; nfa = NFA(states, alphabet, delta, start, accepts, epsilon)</div>
+<div class="line">&gt;&gt;&gt; nfa.pretty_print2()</div>
 <div class="line"><br /></div>
+<div class="line">This FSM has 4 states</div>
+<div class="line">Type : &lt;type &#8216;instance&#8217;&gt;</div>
+<div class="line">(&#8216;States:&#8217;, set([0, 1, 2, 3]))</div>
+<div class="line">(&#8216;Alphabet:&#8217;, set([&#8216;a&#8217;, &#8216;b&#8217;, &#8216;eps&#8217;]))</div>
+<div class="line">(&#8216;Starting state:&#8217;, &#8216;(0)&#8217;)</div>
+<div class="line">(&#8216;Accepting states:&#8217;, set([3]))</div>
+<div class="line">Transition table:</div>
+<div class="line">{0:{a:{None}, b:{1}, eps:{1}},</div>
+<div class="line">1:{a:{2}, b:{None}, eps:{None}},</div>
+<div class="line">2:{a:{3}, b:{1}, eps:{None}},</div>
+<div class="line">3:{a:{None}, b:{None}, eps:{1}}}</div>
+<div class="line">(&#8216;Current state:&#8217;, &#8216;(0, 1)&#8217;)</div>
+<div class="line">(&#8216;Currently accepting:&#8217;, False)</div>
+<div class="line"><br /></div>
+<div class="line">&gt;&gt;&gt; nfa.accepted_under(10)</div>
+<div class="line">[&#8216;aa&#8217;, &#8216;baa&#8217;, &#8216;aaaa&#8217;, &#8216;abaa&#8217;, &#8216;baaaa&#8217;, &#8216;babaa&#8217;, &#8216;aaaaaa&#8217;, &#8216;aaabaa&#8217;, &#8216;abaaaa&#8217;, &#8216;ababaa&#8217;, &#8216;baaaaaa&#8217;, &#8216;baaabaa&#8217;, &#8216;babaaaa&#8217;, &#8216;bababaa&#8217;, &#8216;aaaaaaaa&#8217;, &#8216;aaaaabaa&#8217;, &#8216;aaabaaaa&#8217;, &#8216;aaababaa&#8217;, &#8216;abaaaaaa&#8217;, &#8216;abaaabaa&#8217;, &#8216;ababaaaa&#8217;, &#8216;abababaa&#8217;, &#8216;baaaaaaaa&#8217;, &#8216;baaaaabaa&#8217;, &#8216;baaabaaaa&#8217;, &#8216;baaababaa&#8217;, &#8216;babaaaaaa&#8217;, &#8216;babaaabaa&#8217;, &#8216;bababaaaa&#8217;, &#8216;babababaa&#8217;]</div>
 </div>
-<p><a href="#id1"><span class="problematic" id="id2">|</span></a>This FSM has 4 states
-<a href="#id3"><span class="problematic" id="id4">|</span></a>Type : &lt;type &#8216;instance&#8217;&gt;
-<a href="#id5"><span class="problematic" id="id6">|</span></a>(&#8216;States:&#8217;, set([0, 1, 2, 3]))
-<a href="#id7"><span class="problematic" id="id8">|</span></a>(&#8216;Alphabet:&#8217;, set([&#8216;a&#8217;, &#8216;b&#8217;]))
-<a href="#id9"><span class="problematic" id="id10">|</span></a>(&#8216;Starting state:&#8217;, &#8216;0&#8217;)
-<a href="#id11"><span class="problematic" id="id12">|</span></a>(&#8216;Accepting states:&#8217;, set([3]))
-<a href="#id13"><span class="problematic" id="id14">|</span></a>Transition table:
-<a href="#id15"><span class="problematic" id="id16">|</span></a>{0:{a:{None}, b:{1}},
-<a href="#id17"><span class="problematic" id="id18">|</span></a>1:{a:{2}, b:{None}},
-<a href="#id19"><span class="problematic" id="id20">|</span></a>2:{a:{3}, b:{0}},
-<a href="#id21"><span class="problematic" id="id22">|</span></a>3:{a:{None}, b:{None}}}
-<a href="#id23"><span class="problematic" id="id24">|</span></a>(&#8216;Current state:&#8217;, &#8216;0&#8217;)
-<a href="#id25"><span class="problematic" id="id26">|</span></a>(&#8216;Currently accepting:&#8217;, False)
-|
-| &gt;&gt;&gt;</p>
 </div></blockquote>
 <span class="target" id="module-NFA"></span><dl class="class">
 <dt id="NFA.NFA">
@@ -169,7 +169,7 @@ Returns a dictionnary of states where each element is a dictionnary with (key,va
 
 <dl class="method">
 <dt id="NFA.NFA.input_sequence">
-<tt class="descname">input_sequence</tt><big>(</big><em>char_sequence</em><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.input_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.input_sequence" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">input_sequence</tt><big>(</big><em>char_sequence</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.input_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.input_sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the NFA&#8217;s current state based on an iterable of inputs.</p>
 </dd></dl>
 
@@ -188,7 +188,7 @@ actually that easy to read if it has too many states.</p>
 
 <dl class="method">
 <dt id="NFA.NFA.recognizes">
-<tt class="descname">recognizes</tt><big>(</big><em>char_sequence</em><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.recognizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.recognizes" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">recognizes</tt><big>(</big><em>char_sequence</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/NFA.html#NFA.recognizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#NFA.NFA.recognizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates whether the NFA accepts a given string.</p>
 </dd></dl>
 

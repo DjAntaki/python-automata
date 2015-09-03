@@ -72,6 +72,8 @@ class DFA(FiniteStateMachine):
         if verbose:
             print('Starting state : '+str(self.states))
         for char in char_sequence:
+            if len (self.current_state) == 0:
+                return
             if char not in self.alphabet:
                 if verbose:
                     print('Character '+str(char)+' not in alphabet')
@@ -438,10 +440,9 @@ class DFA(FiniteStateMachine):
             return longest
         return long_path(self.start, 0, None)
 
-    def DFCA_minimize(self, l=None):
+    def dfca_minimize(self, l=None):
         """DFCA minimization
-
-        Input: "self" is a DFA accepting a finite language \n
+        "self" is a DFA accepting a finite language
         Result: "self" is DFCA-minimized, and the returned value is the length of the longest word accepted by the original DFA
 
         See "Minimal cover-automata for finite languages" for context on DFCAs, and
@@ -642,5 +643,5 @@ def finite_factor(self):
     D2 = D1.copy()
     D2.hyper_minimize()
     D3 = symmetric_difference(D1, D2)
-    l = D3.DFCA_minimize()
+    l = D3.dfca_minimize()
     return (D2, (D3, l))

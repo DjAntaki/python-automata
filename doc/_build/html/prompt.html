@@ -54,11 +54,23 @@
             
   <div class="section" id="prompt-interface">
 <h1>Prompt Interface<a class="headerlink" href="#prompt-interface" title="Permalink to this headline">¶</a></h1>
-<p>To use the interactive prompt interface, use one of the two following command :</p>
-<p>.../python_automata$ python -i src/prompt2.py
-.../python_automata$ python3 -i src/prompt.py</p>
-<p>You will be then asked</p>
-<p>Once you finish creating automata you can choose the option x the leave the prompt loop and access the python interactive prompt. Your created automata will be in the dictionnary &#8216;saved&#8217;</p>
+<p>To run the interactive prompt interface, use one of the two following command :</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">.../python_automata$ python -i src/prompt2.py</div>
+<div class="line">.../python_automata$ python3 -i src/prompt.py</div>
+</div>
+</div></blockquote>
+<p>You can then call one of the two prompt function (dfa_input or nfa_input). Those function return respectively a deterministic and a non-deterministic finite automaton.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">&gt;&gt;&gt; dfa1 = dfa_input()</div>
+</div>
+<div class="line-block">
+<div class="line">&gt;&gt;&gt; nfa1 = nfa_input()</div>
+</div>
+</div></blockquote>
+<p>The instructions given by the prompt should be sufficient for good use.</p>
 <span class="target" id="module-prompt"></span><dl class="function">
 <dt id="prompt.dfa_input">
 <tt class="descclassname">prompt.</tt><tt class="descname">dfa_input</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/prompt.html#dfa_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#prompt.dfa_input" title="Permalink to this definition">¶</a></dt>

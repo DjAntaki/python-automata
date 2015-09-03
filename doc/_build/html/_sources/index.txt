@@ -3,8 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to python-automata's documentation!
+Python_automata's documentation
 ===========================================
+
+Python_automata is library that aims to be a simple interface for computation with deterministic finite state automaton (DFA) and non-deterministic finite state automaton (NFA).
+
+Each of the following page contains example of typical use and documentations of all functions
 
 Contents:
 

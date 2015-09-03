@@ -14,7 +14,7 @@ if __name__ == '__main__':
      return (state*2+1)%5
     d = DFA.DFA(states=states, start=start, accepts=accepts, alphabet=alphabet, delta=delta)
     print "Given a binary input, d accepts if the number represented is divisible by 5 (plus the empty string):"
-    d.pretty_print()
+    d.prettyprint()
     #raw_input()
     print 'd.input_sequence("1110101011101") #7517'
     d.step_sequence("1110101011101") #7517
@@ -38,17 +38,17 @@ if __name__ == '__main__':
     print "..."
     #raw_input()
     print "===The starting DFA==="
-    e.pretty_print()
+    e.prettyprint()
     #raw_input()
     print "==Minimized==="
     e.minimize()
-    e.pretty_print()
+    e.prettyprint()
     #raw_input()
     print "==...then DFCA-Minimized==="
-    e.DFCA_minimize()
-    e.pretty_print()
+    e.dfca_minimize()
+    e.prettyprint()
     #raw_input()
     print "==...then Finite-Difference Minimized==="
     e.hyper_minimize()
-    e.pretty_print()
+    e.prettyprint()
     #raw_input()
