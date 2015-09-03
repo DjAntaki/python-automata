@@ -123,6 +123,27 @@
 <span class="c"># Administrative functions:</span>
 <span class="c">#</span>
 </div>
+<div class="viewcode-block" id="FiniteStateMachine.remap"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine.remap">[docs]</a>    <span class="k">def</span> <span class="nf">remap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q0</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function changes the output of one transition</span>
+<span class="sd">        q0 : the initial state</span>
+<span class="sd">        a : a symbol of the alphabet</span>
+<span class="sd">        q : the final states. Can be an object or a set of objects</span>
+
+<span class="sd">        q0 -a-&gt; q</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="n">q0</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+        <span class="k">assert</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alphabet</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">q</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_transition_table</span><span class="p">()</span>
+        <span class="n">table</span><span class="p">[</span><span class="n">q0</span><span class="p">][</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">c</span> <span class="p">:</span> <span class="n">table</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">c</span><span class="p">]</span>
+
+</div>
 <div class="viewcode-block" id="FiniteStateMachine.prettyprint"><a class="viewcode-back" href="../FiniteStateMachine.html#FiniteStateMachine.FiniteStateMachine.prettyprint">[docs]</a>    <span class="k">def</span> <span class="nf">prettyprint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Displays all information about the FSM in an easy-to-read way. Not</span>
 <span class="sd">        actually that easy to read if it has too many states.</span>

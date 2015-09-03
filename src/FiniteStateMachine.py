@@ -81,12 +81,13 @@ class FiniteStateMachine:
         a : a symbol of the alphabet
         q : the final states. Can be an object or a set of objects
 
-        q0 -a-> set([q])
+        q0 -a-> q
         """
 
         assert q0 in self.states
         assert a in self.alphabet
-        assert q <= self.states
+        if not q in self.states:
+            assert q <= self.states
 
         table = self.get_transition_table()
         table[q0][a] = q
