@@ -80,9 +80,6 @@ def dfa_input():
     """
     print("Welcome to the DFA prompt")
     while(True):
-        print("Enter a label for your DFA :")
-        label = raw_input()
-
         print("Enter size of alphabet :")
         tmp = raw_input("|E| = ")
         try:
@@ -179,9 +176,6 @@ def nfa_input():
 
     print("Welcome to the NFA prompt")
     while(True):
-        print("Enter a label for your NFA :")
-        label = raw_input()
-    
         print("Enter size of alphabet :")
         tmp = raw_input("|E| = ")
         try:

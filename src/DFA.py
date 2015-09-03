@@ -77,7 +77,7 @@ class DFA(FiniteStateMachine):
             if char not in self.alphabet:
                 if verbose:
                     print('Character '+str(char)+' not in alphabet')
-                self.current_state = set()
+                self.current_state = None
                 return
 
             self.step(char)

@@ -27,9 +27,6 @@ def dfa_input():
     """
     print("Welcome to the DFA prompt")
     while(True):
-        print("Enter a label for your DFA :")
-        label = input()
-
         print("Enter size of alphabet :")
         tmp = input("|E| = ")
         try:
@@ -113,7 +110,6 @@ def dfa_input():
 
 #   def __init__(self, states, alphabet, delta, start, accepts, epsilon='epi'):
     n = DFA(states,alphabet,lambda x,y:transition_table[x][y],0,finals)
-    n.label = label
     print("You have sucessfully created a DFA.")
 
     return n
@@ -125,10 +121,7 @@ def nfa_input():
     """
 
     print("Welcome to the NFA prompt")
-    while(True):
-        print("Enter a label for your NFA :")
-        label = input()
-    
+    while(True):    
         print("Enter size of alphabet :")
         tmp = input("|E| = ")
         try:
