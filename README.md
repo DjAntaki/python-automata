@@ -9,7 +9,6 @@ Supports :
 - Creating DFA from NFA
 - Multiple minimization algorithms for DFA
 - generalized cross-product operation between DFA (including union, intersection, symmetric difference)
-- 
 
 See file doc/index.html for complete documentation and examples.
 
