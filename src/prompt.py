@@ -110,7 +110,7 @@ def dfa_input():
 
 #   def __init__(self, states, alphabet, delta, start, accepts, epsilon='epi'):
     n = DFA(states,alphabet,lambda x,y:transition_table[x][y],0,finals)
-    print("You have sucessfully created a DFA.")
+    print("You have successfully created a DFA.")
 
     return n
 
@@ -208,7 +208,7 @@ def nfa_input():
     alphabet.remove('epsilon')
     n = NFA(states,alphabet,lambda x,y:transition_table[x][y],0,finals, epsilon="epsilon")
    
-    print("You have sucessfully created a NFA.")
+    print("You have successfully created a NFA.")
 
     return n
 

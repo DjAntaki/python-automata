@@ -3,7 +3,7 @@
 Librairy in python to manipulate deterministic and non-deterministic finite automata (from now on referenced has DFA and NFA or finites automata). 
 
 Supports :
-- Simulation of DFA and NFA exection step by step or over an iterable sequence
+- Simulation of DFA and NFA execution step by step or over an iterable sequence
 - Validation of the definition of a finite automata. 
 - Creating a NFA from a limited regex expression (operators supported in priority order : (),+,*, concatenation and |)
 - Creating DFA from NFA
