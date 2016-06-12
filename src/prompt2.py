@@ -41,7 +41,7 @@ If you do not wish for a transition to exist, press enter
 0 -b-> 1
 1 -a->
 1 -b-> 1
-You have sucessfully created a DFA.
+You have successfully created a DFA.
 If you want to save this finite state machine, please enter a path.
 If you do not want to save, press enter. automatas/dfa1.aut
 
@@ -162,7 +162,7 @@ def dfa_input():
 #   def __init__(self, states, alphabet, delta, start, accepts, epsilon='epi'):
     n = DFA(states,alphabet,lambda x,y:transition_table[x][y],0,finals)
     
-    print("You have sucessfully created a DFA.")
+    print("You have successfully created a DFA.")
 
     return n
 
@@ -260,6 +260,6 @@ def nfa_input():
     alphabet.remove('epsilon')
     n = NFA(states,alphabet,lambda x,y:transition_table[x][y],0,finals, epsilon="epsilon")
     
-    print("You have sucessfully created a NFA.")
+    print("You have successfully created a NFA.")
 
     return n
